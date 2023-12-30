@@ -2,6 +2,7 @@ import express, { Express } from "express";
 import cors from "cors";
 import { connect } from "../../config/databaseConfig";
 import { CharacterService } from "../../character/services/characterService";
+import { v4 } from "uuid";
 
 export class ExpressServer {
   private app: Express;
@@ -26,6 +27,15 @@ export class ExpressServer {
         const characterService = new CharacterService()
         const characters = await characterService.getAllCharacters()
         console.log({ characters })
+
+        const createResponse = await characterService.createCharacter({
+          description: 'Prueba de char',
+          id: v4(),
+          name: 'Random xd'
+        })
+        console.log({
+          createResponse
+        })
       })
     } catch (error) {
       console.error(error)

@@ -16,7 +16,7 @@ export class CharacterService {
     return this.characterRepository.getCharacter(id)
   }
 
-  public async createCharacter(data: Partial<Character>): Promise<Character> {
+  public async createCharacter(data: Partial<Character>): Promise<boolean> {
     return this.characterRepository.createCharacter(data)
   }
 }
