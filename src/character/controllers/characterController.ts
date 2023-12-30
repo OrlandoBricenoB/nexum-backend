@@ -1,26 +1,26 @@
-import { Request, Response } from "express";
-import { CharacterService } from "../services/characterService";
-import { Character } from "../domain/character";
+import { Request, Response } from 'express'
+import { CharacterService } from '../services/characterService'
+import { Character } from '../domain/character'
 import { v4 as uuidv4 } from 'uuid'
 
-const characterService = new CharacterService();
+const characterService = new CharacterService()
 
 export class CharacterController {
   public async getAllCharacters(req: Request, res: Response): Promise<void> {
-    const characters = await characterService.getAllCharacters();
-    res.json(characters);
+    const characters = await characterService.getAllCharacters()
+    res.json(characters)
   }
 
   public async getCharacter(req: Request, res: Response): Promise<void> {
-    const id = req.params.id;
+    const id = req.params.id
 
-    const character = await characterService.getCharacter(id);
-    res.json(character);
+    const character = await characterService.getCharacter(id)
+    res.json(character)
   }
 
   public async createCharacter(req: Request, res: Response): Promise<void> {
     try {
-      const data = req.body as Partial<Character>;
+      const data = req.body as Partial<Character>
 
       // * Get Fields of Character Domain
       const emptyCharacter = new Character('', '', '')

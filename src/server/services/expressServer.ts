@@ -1,25 +1,25 @@
-import express, { Express } from "express";
-import cors from "cors";
-import { connect } from "../../config/databaseConfig";
-import { CharacterService } from "../../character/services/characterService";
-import { v4 } from "uuid";
+import express, { Express } from 'express'
+import cors from 'cors'
+import { connect } from '../../config/databaseConfig'
+import { CharacterService } from '../../character/services/characterService'
+import { v4 } from 'uuid'
 
 export class ExpressServer {
-  private app: Express;
+  private app: Express
 
   constructor() {
-    this.app = express();
-    this.app.use(cors());
-    this.app.use(express.json());
+    this.app = express()
+    this.app.use(cors())
+    this.app.use(express.json())
   }
 
   public getApp(): Express {
-    return this.app;
+    return this.app
   }
 
   public async listen(port: number): Promise<void> {
     try {
-      await connect();
+      await connect()
 
       this.app.listen(port, async () => {
         console.log(`Server running on port ${port}`)

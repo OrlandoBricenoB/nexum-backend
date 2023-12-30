@@ -1,5 +1,5 @@
-import { ExpressServer } from "./server/services/expressServer";
-import { registerRoutes } from "./server/routes";
+import { ExpressServer } from './server/services/expressServer'
+import { registerRoutes } from './server/routes'
 import { config } from 'dotenv'
 config()
 

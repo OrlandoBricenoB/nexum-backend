@@ -1,8 +1,8 @@
-import { Character } from "../domain/character";
-import { CharacterRepository } from "../repositories/characterRepository";
+import { Character } from '../domain/character'
+import { CharacterRepository } from '../repositories/characterRepository'
 
 export class CharacterService {
-  private characterRepository: CharacterRepository;
+  private characterRepository: CharacterRepository
 
   constructor() {
     this.characterRepository = new CharacterRepository()

@@ -1,5 +1,5 @@
-import { database } from "../../config/databaseConfig";
-import { Character } from "../domain/character";
+import { database } from '../../config/databaseConfig'
+import { Character } from '../domain/character'
 
 export class CharacterRepository {
   public async getAllCharacters(): Promise<Character[]> {

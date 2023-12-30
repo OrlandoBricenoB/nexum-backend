@@ -1,5 +1,5 @@
-import type { Db } from "mongodb"
-import { DatabaseRepository } from "./databaseRepository"
+import type { Db } from 'mongodb'
+import { DatabaseRepository } from './databaseRepository'
 
 export class MongoRepository extends DatabaseRepository {
   database: Db
