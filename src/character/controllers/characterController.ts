@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import { CharacterService } from '../services/characterService'
 import { Character } from '../domain/character'
 import { v4 as uuidv4 } from 'uuid'
+import { NotFound } from '../../shared/errors/customErrors'
 
 const characterService = new CharacterService()
 
@@ -15,7 +16,13 @@ export class CharacterController {
     const id = req.params.id
 
     const character = await characterService.getCharacter(id)
-    res.json(character)
+
+    if (character) {
+      res.json(character)
+    } else {
+      const notFoundError = new NotFound('CHARACTER_NOT_FOUND')
+      res.status(notFoundError.status).send({ error: notFoundError })
+    }
   }
 
   public async createCharacter(req: Request, res: Response): Promise<void> {
