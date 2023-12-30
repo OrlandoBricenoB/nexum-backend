@@ -21,7 +21,7 @@ export class DatabaseRepository {
     throw new Error('Not implemented');
   }
 
-  async delete(collectionName: string, id: string): Promise<void> {
+  async delete(collectionName: string, id: string): Promise<boolean> {
     throw new Error('Not implemented');
   }
 }

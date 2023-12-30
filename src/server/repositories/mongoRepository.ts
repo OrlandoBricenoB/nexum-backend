@@ -29,8 +29,9 @@ export class MongoRepository extends DatabaseRepository {
     return collection.updateOne({ id }, { $set: data }) as unknown as T
   }
 
-  async delete(collectionName: string, id: string): Promise<void> {
+  async delete(collectionName: string, id: string): Promise<boolean> {
     const collection = this.database.collection(collectionName)
-    collection.deleteOne({ id })
+    const response = await collection.deleteOne({ id })
+    return response?.deletedCount === 1
   }
 }

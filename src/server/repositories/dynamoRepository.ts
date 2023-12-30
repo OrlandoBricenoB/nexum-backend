@@ -25,6 +25,7 @@ export class DynamoRepository extends DatabaseRepository {
     return {} as T
   }
 
-  async delete(collectionName: string, id: string): Promise<void> {
+  async delete(collectionName: string, id: string): Promise<boolean> {
+    return true
   }
 }
