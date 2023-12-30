@@ -19,14 +19,14 @@ export class MongoRepository extends DatabaseRepository {
     return collection.findOne({ id }) as unknown as T | null
   }
 
-  async create<T>(collectionName: string, data: Partial<T>): Promise<void> {
+  async create<T>(collectionName: string, data: Partial<T>): Promise<T> {
     const collection = this.database.collection(collectionName)
-    collection.insertOne(data)
+    return collection.insertOne(data) as unknown as T
   }
 
-  async update<T>(collectionName: string, id: string, data: Partial<T>): Promise<void> {
+  async update<T>(collectionName: string, id: string, data: Partial<T>): Promise<T> {
     const collection = this.database.collection(collectionName)
-    collection.updateOne({ id }, { $set: data })
+    return collection.updateOne({ id }, { $set: data }) as unknown as T
   }
 
   async delete(collectionName: string, id: string): Promise<void> {

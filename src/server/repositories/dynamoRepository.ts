@@ -17,10 +17,12 @@ export class DynamoRepository extends DatabaseRepository {
     return null
   }
 
-  async create<T>(collectionName: string, data: Partial<T>): Promise<void> {
+  async create<T>(collectionName: string, data: Partial<T>): Promise<T> {
+    return {} as T
   }
 
-  async update<T>(collectionName: string, id: string, data: Partial<T>): Promise<void> {
+  async update<T>(collectionName: string, id: string, data: Partial<T>): Promise<T> {
+    return {} as T
   }
 
   async delete(collectionName: string, id: string): Promise<void> {

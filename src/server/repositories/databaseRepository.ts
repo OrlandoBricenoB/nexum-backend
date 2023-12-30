@@ -13,11 +13,11 @@ export class DatabaseRepository {
     throw new Error('Not implemented');
   }
 
-  async create<T>(collectionName: string, data: Partial<T>): Promise<void> {
+  async create<T>(collectionName: string, data: Partial<T>): Promise<T> {
     throw new Error('Not implemented');
   }
 
-  async update<T>(collectionName: string, id: string, data: Partial<T>): Promise<void> {
+  async update<T>(collectionName: string, id: string, data: Partial<T>): Promise<T> {
     throw new Error('Not implemented');
   }
 
