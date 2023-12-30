@@ -9,4 +9,8 @@ export class CharacterRepository {
   public async getCharacter(id: string): Promise<Character | null> {
     return database.getById<Character>('characters', id)
   }
+
+  public async createCharacter(data: Partial<Character>) {
+    return database.create<Character>('characters', data)
+  }
 }

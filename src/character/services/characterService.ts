@@ -16,5 +16,7 @@ export class CharacterService {
     return this.characterRepository.getCharacter(id)
   }
 
-  // Puedes implementar otras funciones relacionadas con la lógica de negocio de las galerías
+  public async createCharacter(data: Partial<Character>): Promise<Character> {
+    return this.characterRepository.createCharacter(data)
+  }
 }

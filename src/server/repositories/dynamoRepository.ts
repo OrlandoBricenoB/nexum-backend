@@ -17,8 +17,8 @@ export class DynamoRepository extends DatabaseRepository {
     return null
   }
 
-  async create<T>(collectionName: string, data: Partial<T>): Promise<T> {
-    return {} as T
+  async create<T>(collectionName: string, data: Partial<T>): Promise<boolean> {
+    return true
   }
 
   async update<T>(collectionName: string, id: string, data: Partial<T>): Promise<T> {

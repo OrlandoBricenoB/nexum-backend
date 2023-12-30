@@ -19,9 +19,11 @@ export class MongoRepository extends DatabaseRepository {
     return collection.findOne({ id }) as unknown as T | null
   }
 
-  async create<T>(collectionName: string, data: Partial<T>): Promise<T> {
+  async create<T>(collectionName: string, data: Partial<T>): Promise<boolean> {
     const collection = this.database.collection(collectionName)
-    return collection.insertOne(data) as unknown as T
+    const response = await collection.insertOne(data)
+
+    return !!response?.insertedId
   }
 
   async update<T>(collectionName: string, id: string, data: Partial<T>): Promise<T> {
