@@ -3,13 +3,19 @@ import { CharacterService } from '../services/characterService'
 import { Character } from '../domain/character'
 import { v4 as uuidv4 } from 'uuid'
 import { NotFound } from '../../shared/errors/customErrors'
+import { pick } from 'lodash'
 
 const characterService = new CharacterService()
 
 export class CharacterController {
   public async getAllCharacters(req: Request, res: Response): Promise<void> {
     const characters = await characterService.getAllCharacters()
-    res.json(characters)
+
+    res.json(
+      characters.map(character => {
+        return pick(character, Character.fields)
+      })
+    )
   }
 
   public async getCharacter(req: Request, res: Response): Promise<void> {
@@ -18,7 +24,7 @@ export class CharacterController {
     const character = await characterService.getCharacter(id)
 
     if (character) {
-      res.json(character)
+      res.json(pick(character, Character.fields))
     } else {
       const notFoundError = new NotFound('CHARACTER_NOT_FOUND')
       res.status(notFoundError.status).send({ error: notFoundError })
@@ -30,8 +36,8 @@ export class CharacterController {
       const data = req.body as Partial<Character>
 
       // * Get Fields of Character Domain
-      const emptyCharacter = new Character('', '', '')
-      const fields = Object(emptyCharacter)
+      const emptyCharacter = new Character('', '', '', '', '')
+      const fields = Object.keys(emptyCharacter)
 
       const validData = Object.keys({
         ...data,
