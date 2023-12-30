@@ -29,9 +29,10 @@ export class ExpressServer {
         console.log({ characters })
 
         const createResponse = await characterService.createCharacter({
-          description: 'Prueba de char',
           id: v4(),
-          name: 'Random xd'
+          name: 'Random xd',
+          division: 'elite',
+          kingdom: 'aurora'
         })
         console.log({
           createResponse
