@@ -5,5 +5,6 @@ const accountController = new AccountController()
 const router = Router()
 
 router.get('/', accountController.getAccount)
+router.get('/sessions', accountController.getAccountSessions)
 
 export const AccountsRouter = router
