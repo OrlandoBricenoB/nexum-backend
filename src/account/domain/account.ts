@@ -1,5 +1,3 @@
-import { omit } from 'lodash'
-
 export class Account {
   public id: string
   public username: string
@@ -21,6 +19,6 @@ export class Account {
   private static privateFields: (keyof Account)[] = ['password']
 
   public static getPublicFields(): (keyof Account)[] {
-    return omit(this.fields, this.privateFields) as (keyof Account)[]
+    return this.fields.filter(field => !this.privateFields.includes(field)) as (keyof Account)[]
   }
 }
