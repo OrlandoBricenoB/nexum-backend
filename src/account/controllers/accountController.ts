@@ -77,4 +77,28 @@ export default class AccountController extends ControllerBase {
 
     res.send(allSessions.map(session => pick(session, AccountSession.fields)))
   }
+
+  public async getAccountSessionById(req: Request, res: Response): Promise<void> {
+    const session_id = req.params.id
+
+    if (!session_id) {
+      const missingAuthorizationHeaderError = new Unauthorized('MISSING_AUTHORIZATION_HEADER')
+
+      res.status(missingAuthorizationHeaderError.status).send({ error: missingAuthorizationHeaderError })
+
+      return
+    }
+
+    const accountSession = await this.accountSessionService.getAccountSession(session_id)
+
+    if (!accountSession) {
+      const accountSessionNotFoundError = new NotFound('ACCOUNT_SESSION_NOT_FOUND')
+
+      res.status(accountSessionNotFoundError.status).send({ error: accountSessionNotFoundError })
+
+      return
+    }
+
+    res.send(pick(accountSession, AccountSession.fields))
+  }
 }
