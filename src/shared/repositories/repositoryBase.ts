@@ -12,7 +12,7 @@ export class RepositoryBase<T> {
   }
 
   protected async getByID(id: string): Promise<T | null> {
-    return database.getByID(this.collection_name, id)
+    return database.getByID<T>(this.collection_name, id)
   }
 
   protected async create(data: Partial<T>): Promise<boolean> {
