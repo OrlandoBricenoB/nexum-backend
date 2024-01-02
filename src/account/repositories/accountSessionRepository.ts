@@ -1,4 +1,4 @@
-import { RepositoryBase } from '../../shared/domain/repositoryBase'
+import { RepositoryBase } from '../../shared/repositories/repositoryBase'
 import { AccountSession } from '../domain/accountSession'
 
 export class AccountSessionRepository extends RepositoryBase<AccountSession> {
@@ -7,7 +7,7 @@ export class AccountSessionRepository extends RepositoryBase<AccountSession> {
   }
 
   public async getAccountSession(id: string): Promise<AccountSession | null> {
-    return this.getById(id)
+    return this.getByID(id)
   }
 
   public getAllAccountSessions(): Promise<AccountSession[]> {

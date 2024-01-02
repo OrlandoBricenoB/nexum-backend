@@ -13,7 +13,7 @@ export class DynamoRepository extends DatabaseRepository {
     return []
   }
 
-  async getById<T>(_collectionName: string, _id: string): Promise<T | null> {
+  async getByID<T>(_collectionName: string, _id: string): Promise<T | null> {
     return null
   }
 

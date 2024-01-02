@@ -1,4 +1,4 @@
-import { RepositoryBase } from '../../shared/domain/repositoryBase'
+import { RepositoryBase } from '../../shared/repositories/repositoryBase'
 import { Account } from '../domain/account'
 
 export class AccountRepository extends RepositoryBase<Account> {
@@ -7,6 +7,6 @@ export class AccountRepository extends RepositoryBase<Account> {
   }
 
   public async getAccount(id: string): Promise<Account | null> {
-    return this.getById(id)
+    return this.getByID(id)
   }
 }

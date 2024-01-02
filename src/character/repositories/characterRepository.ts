@@ -1,4 +1,4 @@
-import { RepositoryBase } from '../../shared/domain/repositoryBase'
+import { RepositoryBase } from '../../shared/repositories/repositoryBase'
 import { Character } from '../domain/character'
 
 export class CharacterRepository extends RepositoryBase<Character> {
@@ -11,7 +11,7 @@ export class CharacterRepository extends RepositoryBase<Character> {
   }
 
   public async getCharacter(id: string): Promise<Character | null> {
-    return this.getById(id)
+    return this.getByID(id)
   }
 
   public async createCharacter(data: Partial<Character>) {

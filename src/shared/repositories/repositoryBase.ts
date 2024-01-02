@@ -11,8 +11,8 @@ export class RepositoryBase<T> {
     return database.getAll<T>(this.collection_name)
   }
 
-  protected async getById(id: string): Promise<T | null> {
-    return database.getById(this.collection_name, id)
+  protected async getByID(id: string): Promise<T | null> {
+    return database.getByID(this.collection_name, id)
   }
 
   protected async create(data: Partial<T>): Promise<boolean> {
