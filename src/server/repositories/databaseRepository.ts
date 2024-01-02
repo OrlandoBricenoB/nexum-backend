@@ -9,7 +9,7 @@ export class DatabaseRepository {
     throw new Error('Not implemented')
   }
 
-  async getById<T>(_collectionName: string, _id: string): Promise<T | null> {
+  async getByID<T>(_collectionName: string, _id: string): Promise<T | null> {
     throw new Error('Not implemented')
   }
 
