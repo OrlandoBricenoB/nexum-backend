@@ -1,14 +1,16 @@
-import { database } from '../../config/databaseConfig'
+import { RepositoryBase } from '../../shared/domain/repositoryBase'
 import { AccountSession } from '../domain/accountSession'
 
-export class AccountSessionRepository {
-  private COLLECTION_NANE = 'account_sessions'
+export class AccountSessionRepository extends RepositoryBase<AccountSession> {
+  constructor() {
+    super('account_sessions')
+  }
 
   public async getAccountSession(id: string): Promise<AccountSession | null> {
-    return database.getById<AccountSession>(this.COLLECTION_NANE, id)
+    return this.getById(id)
   }
 
   public getAllAccountSessions(): Promise<AccountSession[]> {
-    return database.getAll<AccountSession>(this.COLLECTION_NANE)
+    return this.getAll()
   }
 }

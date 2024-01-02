@@ -1,10 +1,12 @@
-import { database } from '../../config/databaseConfig'
+import { RepositoryBase } from '../../shared/domain/repositoryBase'
 import { Account } from '../domain/account'
 
-export class AccountRepository {
-  private COLLECTION_NAME = 'accounts'
+export class AccountRepository extends RepositoryBase<Account> {
+  constructor() {
+    super('accounts')
+  }
 
   public async getAccount(id: string): Promise<Account | null> {
-    return database.getById<Account>(this.COLLECTION_NAME, id)
+    return this.getById(id)
   }
 }
