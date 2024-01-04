@@ -34,7 +34,7 @@ export class CharacterPastLife {
     this.assists = assists
   }
 
-  public static keys: (keyof CharacterPastLife)[] = [
+  public static fields: (keyof CharacterPastLife)[] = [
     'id',
     'character_id',
     'name',
