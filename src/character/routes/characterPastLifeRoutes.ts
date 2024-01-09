@@ -5,5 +5,6 @@ const characterPastLifeController = new CharacterPastLifeController()
 const router = Router()
 
 router.get('/', characterPastLifeController.getAllCharacterPastLifes)
+router.get('/:id', characterPastLifeController.getCharacterPastLife)
 
 export const CharacterPastLifeRouter = router
