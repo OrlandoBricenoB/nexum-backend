@@ -17,7 +17,7 @@ export class CharacterController extends ControllerBase {
   public async getAllCharacters(req: Request, res: Response): Promise<void> {
     const characters = await this.characterService.getAllCharacters()
 
-    res.json(characters.map(character => Character.create(character)))
+    res.json(characters)
   }
 
   public async getCharacter(req: Request, res: Response): Promise<void> {
@@ -26,7 +26,7 @@ export class CharacterController extends ControllerBase {
     const character = await this.characterService.getCharacter(id)
 
     if (character) {
-      res.json(Character.create(character))
+      res.json(character)
     } else {
       const notFoundError = new NotFound('CHARACTER_NOT_FOUND')
       res.status(notFoundError.status).send({ error: notFoundError })
@@ -40,7 +40,7 @@ export class CharacterController extends ControllerBase {
       const validData = Character.create({
         ...data,
         id: uuidv4()
-      })
+      }) as Character
 
       await this.characterService.createCharacter(validData)
       res.json(validData)
