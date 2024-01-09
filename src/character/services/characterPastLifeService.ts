@@ -15,7 +15,7 @@ export class CharacterPastLifeService {
   }
 
   public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {
-    return this.characterPastLifeRepository.getCharacterPastLifw(id)
+    return this.characterPastLifeRepository.getCharacterPastLife(id)
   }
 
   public async createCharacterPastLife(data: Partial<CharacterPastLife>): Promise<boolean> {

@@ -15,9 +15,9 @@ export class CharacterPastLifeController extends ControllerBase {
   }
 
   public async getAllCharacterPastLifes(req: Request, res: Response): Promise<void> {
-    const { character_id } = req.body as { character_id: string }
+    const { _character_id } = req.body as { _character_id: string }
 
-    const characterPastLifes = await this.characterPastLifeService.getAllCharacterPastLifes(character_id)
+    const characterPastLifes = await this.characterPastLifeService.getAllCharacterPastLifes(_character_id)
 
     res.json(characterPastLifes.map(pastLife => pick(pastLife, CharacterPastLife.fields)))
   }
