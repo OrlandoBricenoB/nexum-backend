@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { CharacterService } from '../services/characterService'
 import { Character } from '../domain/character'
-import { v4 as uuidv4 } from 'uuid'
 import { NotFound } from '../../shared/errors/customErrors'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 
@@ -37,13 +36,11 @@ export class CharacterController extends ControllerBase {
     try {
       const data = req.body as Partial<Character>
 
-      const validData = Character.create({
-        ...data,
-        id: uuidv4()
-      }) as Character
+      const character = Character.create(data) as Character
+      character.new()
 
-      await this.characterService.createCharacter(validData)
-      res.json(validData)
+      await this.characterService.createCharacter(character)
+      res.json(character)
     } catch (error) {
       res.status(500).json(error)
     }
