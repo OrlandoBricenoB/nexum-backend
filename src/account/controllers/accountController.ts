@@ -72,7 +72,7 @@ export default class AccountController extends ControllerBase {
 
     const allSessions = await this.accountSessionService.getSessionsByAccount(accountSession.account_id)
 
-    res.send(allSessions)
+    res.send(allSessions.map(session => session.getInfo()))
   }
 
   public async getAccountSessionById(req: Request, res: Response): Promise<void> {
@@ -96,6 +96,6 @@ export default class AccountController extends ControllerBase {
       return
     }
 
-    res.json(accountSession)
+    res.json(accountSession.getInfo())
   }
 }
