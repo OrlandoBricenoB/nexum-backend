@@ -1,5 +1,6 @@
-export class CharacterPastLife {
-  public id: string
+import { Entity } from '../../shared/domain/entity'
+
+export class CharacterPastLife extends Entity {
   public character_id: string
   public name: string
   public kingdon: string
@@ -22,6 +23,8 @@ export class CharacterPastLife {
     deaths: number,
     assists: number
   ) {
+    super()
+
     this.id = id
     this.character_id = character_id
     this.name = name

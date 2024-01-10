@@ -1,8 +1,6 @@
 import { Request, Response } from 'express'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 import { CharacterPastLifeService } from '../services/characterPastLifeService'
-import { pick } from 'lodash'
-import { CharacterPastLife } from '../domain/characterPastLife'
 import { NotFound } from '../../shared/errors/customErrors'
 
 export class CharacterPastLifeController extends ControllerBase {
@@ -19,7 +17,7 @@ export class CharacterPastLifeController extends ControllerBase {
 
     const characterPastLifes = await this.characterPastLifeService.getAllCharacterPastLifes(character_id)
 
-    res.json(characterPastLifes.map(pastLife => pick(pastLife, CharacterPastLife.fields)))
+    res.json(characterPastLifes)
   }
 
   public async getCharacterPastLife(req: Request, res: Response): Promise<void> {
@@ -28,7 +26,7 @@ export class CharacterPastLifeController extends ControllerBase {
     const characterPastLife = await this.characterPastLifeService.getCharacterPastLife(id)
 
     if (characterPastLife) {
-      res.json(pick(characterPastLife, CharacterPastLife.fields))
+      res.json(characterPastLife)
     } else {
       const notFoundError = new NotFound('CHARACTER_PAST_LIFE_NOT_FOUND')
       res.status(notFoundError.status).send({ error: notFoundError })
