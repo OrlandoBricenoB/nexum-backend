@@ -9,6 +9,8 @@ export class AccountService {
   }
 
   public async getAccount(id: string): Promise<Account | null> {
-    return this.accountRepository.getAccount(id)
+    const account = await this.accountRepository.getAccount(id)
+
+    return account && Account.create(account)
   }
 }

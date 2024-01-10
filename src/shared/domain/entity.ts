@@ -17,4 +17,8 @@ export class Entity {
   public new(): void {
     this.id = uuid()
   }
+
+  public getInfo(): Partial<this> {
+    return { ...this }
+  }
 }

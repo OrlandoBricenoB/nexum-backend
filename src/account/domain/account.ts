@@ -1,5 +1,7 @@
-export class Account {
-  public id: string
+import { omit } from 'lodash'
+import { Entity } from '../../shared/domain/entity'
+
+export class Account extends Entity {
   public username: string
   public password: string
   public email: string
@@ -7,7 +9,8 @@ export class Account {
   public is_verified: string
 
   constructor(id: string, username: string, password: string, email: string, image: string, is_verified: string) {
-    this.id = id
+    super()
+
     this.username = username
     this.password = password
     this.email = email
@@ -15,10 +18,9 @@ export class Account {
     this.is_verified = is_verified
   }
 
-  private static fields: (keyof Account)[] = ['id', 'username', 'password', 'email', 'image', 'is_verified']
-  private static privateFields: (keyof Account)[] = ['password']
+  private static privateFields = ['password']
 
-  public static getPublicFields(): (keyof Account)[] {
-    return this.fields.filter(field => !this.privateFields.includes(field)) as (keyof Account)[]
+  public getInfo() {
+    return omit({ ...this }, Account.privateFields)
   }
 }

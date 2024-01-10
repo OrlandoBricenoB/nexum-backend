@@ -3,9 +3,6 @@ import { ControllerBase } from '../../shared/domain/controllerBase'
 import { AccountService } from '../services/accountService'
 import AccountSessionService from '../services/accountSessionService'
 import { NotFound, Unauthorized } from '../../shared/errors/customErrors'
-import { pick } from 'lodash'
-import { Account } from '../domain/account'
-import { AccountSession } from '../domain/accountSession'
 
 export default class AccountController extends ControllerBase {
   private accountService: AccountService
@@ -49,7 +46,7 @@ export default class AccountController extends ControllerBase {
       return
     }
 
-    res.send(pick(account, Account.getPublicFields()))
+    res.json(account.getInfo())
   }
 
   public async getAccountSessions(req: Request, res: Response): Promise<void> {
@@ -75,7 +72,7 @@ export default class AccountController extends ControllerBase {
 
     const allSessions = await this.accountSessionService.getSessionsByAccount(accountSession.account_id)
 
-    res.send(allSessions.map(session => pick(session, AccountSession.fields)))
+    res.send(allSessions)
   }
 
   public async getAccountSessionById(req: Request, res: Response): Promise<void> {
@@ -99,6 +96,6 @@ export default class AccountController extends ControllerBase {
       return
     }
 
-    res.send(pick(accountSession, AccountSession.fields))
+    res.json(accountSession)
   }
 }
