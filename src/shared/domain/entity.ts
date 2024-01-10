@@ -1,3 +1,4 @@
+import { omit } from 'lodash'
 import { v4 as uuid } from 'uuid'
 
 export class Entity {
@@ -18,7 +19,11 @@ export class Entity {
     this.id = uuid()
   }
 
+  protected getPrivateFields(): (keyof this)[] {
+    return []
+  }
+
   public getInfo(): Partial<this> {
-    return { ...this }
+    return omit({ ...this }, this.getPrivateFields()) as Partial<this>
   }
 }

@@ -1,4 +1,3 @@
-import { omit } from 'lodash'
 import { Entity } from '../../shared/domain/entity'
 
 export class Account extends Entity {
@@ -11,6 +10,7 @@ export class Account extends Entity {
   constructor(id: string, username: string, password: string, email: string, image: string, is_verified: string) {
     super()
 
+    this.id = id
     this.username = username
     this.password = password
     this.email = email
@@ -18,9 +18,7 @@ export class Account extends Entity {
     this.is_verified = is_verified
   }
 
-  private static privateFields = ['password']
-
-  public getInfo() {
-    return omit({ ...this }, Account.privateFields)
+  protected getPrivateFields(): (keyof this)[] {
+    return ['password']
   }
 }
