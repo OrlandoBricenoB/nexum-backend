@@ -11,7 +11,15 @@ export class CharacterPastLifeService {
   public async getAllCharacterPastLifes(character_id: string): Promise<CharacterPastLife[]> {
     const allCharactersPastLifes = await this.characterPastLifeRepository.getAllCharacterPastLifes()
 
-    return allCharactersPastLifes.filter(pastLife => pastLife.character_id === character_id)
+    const characterPastLifes = allCharactersPastLifes.filter(pastLife => pastLife.character_id === character_id)
+
+    return characterPastLifes.map(pastLife => CharacterPastLife.create(pastLife)) as CharacterPastLife[]
+  }
+
+  public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {
+    const characterPastLife = (await this.characterPastLifeRepository.getCharacterPastLifw(id)) as CharacterPastLife
+
+    return CharacterPastLife.create(characterPastLife)
   }
 
   public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {

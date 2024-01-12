@@ -1,5 +1,6 @@
-export class AccountSession {
-  public id: string
+import { Entity } from '../../shared/domain/entity'
+
+export class AccountSession extends Entity {
   public account_id: string
   public name: string
   public user_agent: string
@@ -18,6 +19,8 @@ export class AccountSession {
     last_seen_at: Date,
     expired_at: Date
   ) {
+    super()
+
     this.id = id
     this.account_id = account_id
     this.name = name
@@ -27,15 +30,4 @@ export class AccountSession {
     this.last_seen_at = last_seen_at
     this.expired_at = expired_at
   }
-
-  public static fields: (keyof AccountSession)[] = [
-    'id',
-    'account_id',
-    'name',
-    'user_agent',
-    'ip',
-    'location',
-    'last_seen_at',
-    'expired_at'
-  ]
 }

@@ -1,4 +1,6 @@
-export class CharacterPastLife {
+import { Entity } from '../../shared/domain/entity'
+
+export class CharacterPastLife extends Entity {
   public id: string
   public character_id: string
   public name: string
@@ -22,6 +24,8 @@ export class CharacterPastLife {
     deaths: number,
     assists: number
   ) {
+    super()
+
     this.id = id
     this.character_id = character_id
     this.name = name
@@ -33,17 +37,4 @@ export class CharacterPastLife {
     this.deaths = deaths
     this.assists = assists
   }
-
-  public static fields: (keyof CharacterPastLife)[] = [
-    'id',
-    'character_id',
-    'name',
-    'kingdon',
-    'rank_id',
-    'rebirth',
-    'honor',
-    'kills',
-    'deaths',
-    'assists'
-  ]
 }

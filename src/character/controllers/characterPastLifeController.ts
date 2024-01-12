@@ -19,7 +19,7 @@ export class CharacterPastLifeController extends ControllerBase {
 
     const characterPastLifes = await this.characterPastLifeService.getAllCharacterPastLifes(_character_id)
 
-    res.json(characterPastLifes.map(pastLife => pick(pastLife, CharacterPastLife.fields)))
+    res.json(characterPastLifes.map(pastLife => pastLife.getInfo()))
   }
 
   public async getCharacterPastLife(req: Request, res: Response): Promise<void> {
@@ -28,7 +28,7 @@ export class CharacterPastLifeController extends ControllerBase {
     const characterPastLife = await this.characterPastLifeService.getCharacterPastLife(id)
 
     if (characterPastLife) {
-      res.json(pick(characterPastLife, CharacterPastLife.fields))
+      res.json(characterPastLife.getInfo())
     } else {
       const notFoundError = new NotFound('CHARACTER_PAST_LIFE_NOT_FOUND')
       res.status(notFoundError.status).send({ error: notFoundError })
