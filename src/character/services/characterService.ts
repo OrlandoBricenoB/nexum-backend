@@ -11,13 +11,13 @@ export class CharacterService {
   public async getAllCharacters(): Promise<Character[]> {
     const allCharacters = await this.characterRepository.getAllCharacters()
 
-    return allCharacters.map(character => Character.create(character))
+    return allCharacters.map(character => Character.create(character)) as Character[]
   }
 
   public async getCharacter(id: string): Promise<Character | null> {
     const character = await this.characterRepository.getCharacter(id)
 
-    return character && Character.create(character)
+    return Character.create(character)
   }
 
   public async createCharacter(data: Partial<Character>): Promise<boolean> {

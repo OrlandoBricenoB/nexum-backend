@@ -13,13 +13,13 @@ export class CharacterPastLifeService {
 
     const characterPastLifes = allCharactersPastLifes.filter(pastLife => pastLife.character_id === character_id)
 
-    return characterPastLifes.map(pastLife => CharacterPastLife.create(pastLife))
+    return characterPastLifes.map(pastLife => CharacterPastLife.create(pastLife)) as CharacterPastLife[]
   }
 
   public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {
     const characterPastLife = (await this.characterPastLifeRepository.getCharacterPastLifw(id)) as CharacterPastLife
 
-    return characterPastLife && CharacterPastLife.create(characterPastLife)
+    return CharacterPastLife.create(characterPastLife)
   }
 
   public async createCharacterPastLife(data: Partial<CharacterPastLife>): Promise<boolean> {
