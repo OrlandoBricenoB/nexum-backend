@@ -10,7 +10,7 @@ export class CharacterPastLifeRepository extends RepositoryBase<CharacterPastLif
     return this.getAll()
   }
 
-  public async getCharacterPastLifw(id: string): Promise<CharacterPastLife | null> {
+  public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {
     return this.getByID(id)
   }
 
