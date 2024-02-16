@@ -1,9 +1,7 @@
 import { Request, Response } from 'express'
 import { CharacterService } from '../services/characterService'
 import { Character } from '../domain/character'
-import { v4 as uuidv4 } from 'uuid'
 import { NotFound } from '../../shared/errors/customErrors'
-import { pick } from 'lodash'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 
 export class CharacterController extends ControllerBase {
@@ -18,11 +16,7 @@ export class CharacterController extends ControllerBase {
   public async getAllCharacters(req: Request, res: Response): Promise<void> {
     const characters = await this.characterService.getAllCharacters()
 
-    res.json(
-      characters.map(character => {
-        return pick(character, Character.fields)
-      })
-    )
+    res.json(characters.map(character => character.getInfo()))
   }
 
   public async getCharacter(req: Request, res: Response): Promise<void> {
@@ -31,7 +25,7 @@ export class CharacterController extends ControllerBase {
     const character = await this.characterService.getCharacter(id)
 
     if (character) {
-      res.json(pick(character, Character.fields))
+      res.json(character.getInfo())
     } else {
       const notFoundError = new NotFound('CHARACTER_NOT_FOUND')
       res.status(notFoundError.status).send({ error: notFoundError })
@@ -42,22 +36,11 @@ export class CharacterController extends ControllerBase {
     try {
       const data = req.body as Partial<Character>
 
-      // * Get Fields of Character Domain
-      const emptyCharacter = new Character('', '', '', '', '')
-      const fields = Object.keys(emptyCharacter)
+      const character = Character.create(data) as Character
+      character.new()
 
-      const validData = Object.keys({
-        ...data,
-        id: uuidv4()
-      }).reduce((newData, key) => {
-        if (fields.includes(key)) {
-          newData[key as 'id'] = data[key as 'id']
-        }
-        return newData
-      }, {} as Partial<Character>)
-
-      await this.characterService.createCharacter(validData)
-      res.json(validData)
+      await this.characterService.createCharacter(character)
+      res.json(character.getInfo())
     } catch (error) {
       res.status(500).json(error)
     }

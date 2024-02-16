@@ -1,16 +1,20 @@
-import { database } from '../../config/databaseConfig'
+import { RepositoryBase } from '../../shared/repositories/repositoryBase'
 import { Character } from '../domain/character'
 
-export class CharacterRepository {
+export class CharacterRepository extends RepositoryBase<Character> {
+  constructor() {
+    super('characters')
+  }
+
   public async getAllCharacters(): Promise<Character[]> {
-    return database.getAll<Character>('characters')
+    return this.getAll()
   }
 
   public async getCharacter(id: string): Promise<Character | null> {
-    return database.getById<Character>('characters', id)
+    return this.getByID(id)
   }
 
   public async createCharacter(data: Partial<Character>) {
-    return database.create<Character>('characters', data)
+    return this.create(data)
   }
 }

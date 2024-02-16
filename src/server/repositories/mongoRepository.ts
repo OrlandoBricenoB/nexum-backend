@@ -14,7 +14,7 @@ export class MongoRepository extends DatabaseRepository {
     return collection.find().toArray() as unknown as Promise<T[]>
   }
 
-  async getById<T>(collectionName: string, id: string): Promise<T | null> {
+  async getByID<T>(collectionName: string, id: string): Promise<T | null> {
     const collection = this.database.collection(collectionName)
     return collection.findOne({ id }) as unknown as T | null
   }
