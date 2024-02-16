@@ -8,5 +8,5 @@ const app = server.getApp()
 
 registerRoutes(app)
 
-const port = 3000
-server.listen(port)
+const port = process.env.PORT || 3000
+server.listen(Number(port))
