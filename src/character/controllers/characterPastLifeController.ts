@@ -1,8 +1,6 @@
 import { Request, Response } from 'express'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 import { CharacterPastLifeService } from '../services/characterPastLifeService'
-import { pick } from 'lodash'
-import { CharacterPastLife } from '../domain/characterPastLife'
 import { NotFound } from '../../shared/errors/customErrors'
 
 export class CharacterPastLifeController extends ControllerBase {

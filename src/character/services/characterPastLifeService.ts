@@ -17,13 +17,9 @@ export class CharacterPastLifeService {
   }
 
   public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {
-    const characterPastLife = (await this.characterPastLifeRepository.getCharacterPastLifw(id)) as CharacterPastLife
+    const characterPastLife = (await this.characterPastLifeRepository.getCharacterPastLife(id)) as CharacterPastLife
 
     return CharacterPastLife.create(characterPastLife)
-  }
-
-  public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {
-    return this.characterPastLifeRepository.getCharacterPastLife(id)
   }
 
   public async createCharacterPastLife(data: Partial<CharacterPastLife>): Promise<boolean> {

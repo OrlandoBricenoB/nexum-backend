@@ -10,9 +10,11 @@ let database: MongoRepository | DynamoRepository
 async function connect() {
   try {
     if (process.env.DATABASE_TYPE === 'MONGODB') {
-      const mongoUri = process.env.MONGODB_URI || ''
+      const dbUri = process.env.MONGODB_URI
       const dbName = process.env.MONGODB_DB_NAME
-      client = await MongoClient.connect(mongoUri)
+      const dbUser = process.env.MONGODB_USER
+      const dbPassword = process.env.MONGODB_PASSWORD
+      client = await MongoClient.connect(`mongodb+srv://${dbUser}:${dbPassword}@${dbUri}/?retryWrites=true&w=majority`)
 
       const databaseClient = client.db(dbName)
       database = new MongoRepository(databaseClient)
