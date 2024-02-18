@@ -48,10 +48,9 @@ export class CharacterController extends ControllerBase {
   }
 
   public async getCharactersByAccount(req: Request, res: Response): Promise<void> {
-    const { _account } = req.body as { _account: Account }
+    const { account } = req.body as { account: Account }
 
-    const characters = await this.characterService.getAllAccountCharacters(_account.id!)
-
+    const characters: Character[] = await this.characterService.getAllAccountCharacters(account.id)
     res.json(characters.map(character => character.getInfo()))
   }
 }
