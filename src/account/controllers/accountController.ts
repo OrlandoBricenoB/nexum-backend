@@ -27,4 +27,15 @@ export default class AccountController extends ControllerBase {
 
     res.send(allSessions.map(session => session.getInfo()))
   }
+
+  public async createAccount(req: Request, res: Response): Promise<void> {
+    res.send('')
+  }
+
+  public async selectSessionCharacter(req: Request, res: Response): Promise<void> {
+    const { character_id } = req.body as { character_id: string }
+    // accountSession tiene el campo character_id
+
+    res.json({ character_id })
+  }
 }
