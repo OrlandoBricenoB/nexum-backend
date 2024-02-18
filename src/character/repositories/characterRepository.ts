@@ -1,3 +1,4 @@
+import { FindQuery } from '../../server/domain/FindQuery'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
 import { Character } from '../domain/character'
 
@@ -6,8 +7,8 @@ export class CharacterRepository extends RepositoryBase<Character> {
     super('characters')
   }
 
-  public async getAllCharacters(): Promise<Character[]> {
-    return this.getAll()
+  public async getAllCharacters(query?: FindQuery<Character>): Promise<Character[]> {
+    return this.getAll(query)
   }
 
   public async getCharacter(id: string): Promise<Character | null> {

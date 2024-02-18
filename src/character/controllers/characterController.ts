@@ -3,6 +3,7 @@ import { CharacterService } from '../services/characterService'
 import { Character } from '../domain/character'
 import { NotFound } from '../../shared/errors/customErrors'
 import { ControllerBase } from '../../shared/domain/controllerBase'
+import { Account } from '../../account/domain/account'
 
 export class CharacterController extends ControllerBase {
   private characterService: CharacterService
@@ -44,5 +45,13 @@ export class CharacterController extends ControllerBase {
     } catch (error) {
       res.status(500).json(error)
     }
+  }
+
+  public async getCharactersByAccount(req: Request, res: Response): Promise<void> {
+    const { _account } = req.body as { _account: Account }
+
+    const characters = await this.characterService.getAllAccountCharacters(_account.id!)
+
+    res.json(characters.map(character => character.getInfo()))
   }
 }

@@ -23,4 +23,10 @@ export class CharacterService {
   public async createCharacter(data: Partial<Character>): Promise<boolean> {
     return this.characterRepository.createCharacter(data)
   }
+
+  public async getAllAccountCharacters(account_id: string): Promise<Character[]> {
+    const allAccountCharacters = await this.characterRepository.getAllCharacters({ account_id })
+
+    return allAccountCharacters.map(character => Character.create(character)) as Character[]
+  }
 }
