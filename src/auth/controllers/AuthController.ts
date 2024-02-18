@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { Unauthorized } from '../../shared/errors/customErrors'
+import { BadRequest, Unauthorized } from '../../shared/errors/customErrors'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 import { AccountService } from '../../account/services/accountService'
 import AccountSessionService from '../../account/services/accountSessionService'
@@ -22,9 +22,18 @@ export class AuthController extends ControllerBase {
       username: string
       password: string
     }
-    const username = data.username.toLowerCase().trim()
 
     try {
+      if (!data?.username || !data?.password) {
+        const badRequestError = new BadRequest()
+        res.status(badRequestError.status).json({
+          error: badRequestError
+        })
+        return
+      }
+
+      const username = data?.username.toLowerCase().trim()
+
       const account = await this.accountService.getAccounts({
         username
       })
