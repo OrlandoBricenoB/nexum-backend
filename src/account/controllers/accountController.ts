@@ -4,6 +4,7 @@ import AccountSessionService from '../services/accountSessionService'
 import { Account } from '../domain/account'
 import { isEmpty } from 'lodash'
 import { BadRequest } from '../../shared/errors/customErrors'
+import { AccountSession } from '../domain/accountSession'
 
 export default class AccountController extends ControllerBase {
   private accountSessionService: AccountSessionService
@@ -35,7 +36,7 @@ export default class AccountController extends ControllerBase {
   }
 
   public async selectSessionCharacter(req: Request, res: Response): Promise<void> {
-    const { character_id } = req.body as { character_id: string }
+    const { character_id, _session } = req.body as { character_id: string; _session: AccountSession }
 
     if (isEmpty(character_id)) {
       const error = new BadRequest()
@@ -45,7 +46,7 @@ export default class AccountController extends ControllerBase {
       return
     }
 
-    await this.accountSessionService.updateSession({ character_id })
+    await this.accountSessionService.updateSession({ id: _session.id, character_id })
 
     res.json({ character_id })
   }
