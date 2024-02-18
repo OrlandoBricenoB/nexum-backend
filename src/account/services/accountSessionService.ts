@@ -1,3 +1,4 @@
+import { FindQuery } from '../../server/domain/FindQuery'
 import { AccountSession } from '../domain/accountSession'
 import { AccountSessionRepository } from '../repositories/accountSessionRepository'
 
@@ -8,16 +9,25 @@ export default class AccountSessionService {
     this.accountSessionRepository = new AccountSessionRepository()
   }
 
+  public async createSession(data: Partial<AccountSession>): Promise<boolean> {
+    const accountSession = await this.accountSessionRepository.createSession(data)
+    return accountSession
+  }
+
+  public async getSessions(query: FindQuery<AccountSession>): Promise<AccountSession[]> {
+    const allSessions = await this.accountSessionRepository.getAllAccountSessions(query)
+    return allSessions
+  }
+
   public async getAccountSession(id: string): Promise<AccountSession | null> {
     const accountSession = await this.accountSessionRepository.getAccountSession(id)
 
     return AccountSession.create(accountSession)
   }
 
-  public async getSessionsByAccount(account_id: string): Promise<AccountSession[]> {
-    const allSessions = await this.accountSessionRepository.getAllAccountSessions()
-    const accountSessions = allSessions.filter(session => session.account_id === account_id)
+  public async updateSession(data: Partial<AccountSession>): Promise<AccountSession | null> {
+    const response = await this.accountSessionRepository.updateSession(data)
 
-    return accountSessions.map(session => AccountSession.create(session)) as AccountSession[]
+    return response
   }
 }

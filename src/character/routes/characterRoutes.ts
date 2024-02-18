@@ -1,10 +1,11 @@
 import { Router } from 'express'
 import { CharacterController } from '../controllers/characterController'
+import { VerifyAuthentication } from '../../auth/middlewares/VerifyAuthentication'
 
 const characterController = new CharacterController()
 const router = Router()
 
-router.get('/', characterController.getAllCharacters)
-router.get('/:id', characterController.getCharacter)
+router.get('/', VerifyAuthentication, characterController.getAllCharacters)
+router.get('/:id', VerifyAuthentication, characterController.getCharacter)
 
 export const CharacterRoutes = router

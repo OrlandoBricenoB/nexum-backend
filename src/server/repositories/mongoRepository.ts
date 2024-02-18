@@ -1,5 +1,6 @@
 import type { Db } from 'mongodb'
 import { DatabaseRepository } from './databaseRepository'
+import { FindQuery } from '../domain/FindQuery'
 
 export class MongoRepository extends DatabaseRepository {
   database: Db
@@ -9,9 +10,9 @@ export class MongoRepository extends DatabaseRepository {
     this.database = database
   }
 
-  async getAll<T>(collectionName: string): Promise<T[]> {
+  async getAll<T>(collectionName: string, query?: FindQuery<T>): Promise<T[]> {
     const collection = this.database.collection(collectionName)
-    return collection.find().toArray() as unknown as Promise<T[]>
+    return collection.find(query || {}).toArray() as unknown as Promise<T[]>
   }
 
   async getByID<T>(collectionName: string, id: string): Promise<T | null> {

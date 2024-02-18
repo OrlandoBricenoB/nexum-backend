@@ -1,11 +1,11 @@
 import { Router } from 'express'
 import AccountController from '../controllers/accountController'
+import { VerifyAuthentication } from '../../auth/middlewares/VerifyAuthentication'
 
 const accountController = new AccountController()
 const router = Router()
 
-router.get('/', accountController.getAccount)
-router.get('/sessions', accountController.getAccountSessions)
-router.get('/session/:id', accountController.getAccountSessionById)
+router.get('/', VerifyAuthentication, accountController.getAccount)
+router.get('/sessions', VerifyAuthentication, accountController.getAccountSessions)
 
 export const AccountsRouter = router

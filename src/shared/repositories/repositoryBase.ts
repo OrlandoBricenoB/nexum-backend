@@ -1,4 +1,5 @@
 import { database } from '../../config/databaseConfig'
+import { FindQuery } from '../../server/domain/FindQuery'
 
 export class RepositoryBase<T> {
   private collection_name: string
@@ -7,8 +8,8 @@ export class RepositoryBase<T> {
     this.collection_name = collection_name
   }
 
-  protected async getAll(): Promise<T[]> {
-    return database.getAll<T>(this.collection_name)
+  protected async getAll(query?: FindQuery<T>): Promise<T[]> {
+    return database.getAll<T>(this.collection_name, query)
   }
 
   protected async getByID(id: string): Promise<T | null> {
