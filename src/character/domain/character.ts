@@ -2,6 +2,7 @@ import { pick } from 'lodash'
 import { Entity } from '../../shared/domain/entity'
 
 export class Character extends Entity {
+  public id: string
   public account_id: string
   public name: string
   public kingdom: string

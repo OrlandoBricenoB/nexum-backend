@@ -1,6 +1,7 @@
 import { Entity } from '../../shared/domain/entity'
 
 export class Account extends Entity {
+  public id: string
   public username: string
   public password: string
   public email: string

@@ -1,6 +1,7 @@
 import { Entity } from '../../shared/domain/entity'
 
 export class AccountSession extends Entity {
+  public id: string
   public account_id: string
   public name: string
   public user_agent: string
