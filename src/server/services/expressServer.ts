@@ -1,6 +1,6 @@
 import express, { Express } from 'express'
 import cors from 'cors'
-import { connect } from '../../config/databaseConfig'
+import { connect, database } from '../../config/databaseConfig'
 import { CharacterService } from '../../character/services/characterService'
 
 export class ExpressServer {
@@ -23,9 +23,11 @@ export class ExpressServer {
       this.app.listen(port, async () => {
         console.log(`Server running on port ${port}`)
 
-        const characterService = new CharacterService()
-        const characters = await characterService.getAllCharacters()
-        console.log({ characters })
+        if (database?.database) {
+          const characterService = new CharacterService()
+          const characters = await characterService.getAllCharacters()
+          console.log({ characters })
+        }
 
         // const createResponse = await characterService.createCharacter({
         //   id: v4(),
