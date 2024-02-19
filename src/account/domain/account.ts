@@ -7,6 +7,7 @@ export class Account extends Entity {
   public email: string
   public image: string
   public is_verified: string
+  private privateFields: string[] = ['password']
 
   constructor(id: string, username: string, password: string, email: string, image: string, is_verified: string) {
     super()
@@ -19,7 +20,7 @@ export class Account extends Entity {
     this.is_verified = is_verified
   }
 
-  protected getPrivateFields(): (keyof this)[] {
-    return ['password']
+  protected getPrivateFields(): string[] {
+    return this.privateFields
   }
 }

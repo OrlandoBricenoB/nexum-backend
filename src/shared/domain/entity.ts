@@ -21,7 +21,11 @@ export class Entity {
     this.id = uuid()
   }
 
-  protected getPrivateFields(): (keyof this)[] {
+  protected getPrivateFields(): string[] {
+    return []
+  }
+
+  public getUniqueFields(): string[] {
     return []
   }
 
