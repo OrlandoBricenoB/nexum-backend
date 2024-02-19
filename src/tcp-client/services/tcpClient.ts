@@ -44,6 +44,8 @@ export class TcpClient {
         this.getClient().write(JSON.stringify(data), cb || (() => false))
         this.getClient().end()
       })
-      .catch(() => { })
+      .catch(err => {
+        console.error(err)
+      })
   }
 }
