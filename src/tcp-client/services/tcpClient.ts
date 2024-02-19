@@ -5,12 +5,12 @@ export class TcpClient {
   private host: string
   private port: number
 
-  constructor(host: string, port: number) {
+  constructor() {
     const client = new net.Socket()
     this.client = client
 
-    this.host = host || 'localhost'
-    this.port = port || 3500
+    this.host = process.env.TCP_HOST || 'localhost'
+    this.port = Number(process.env.TCP_PORT || 3500)
   }
 
   public getClient(): net.Socket {
