@@ -37,6 +37,8 @@ export default class AccountController extends ControllerBase {
   public async createAccount(req: Request, res: Response): Promise<void> {
     const data = req.body as Partial<Account>
 
+    data.is_verified = false
+
     const account = Account.create(data) as Account
 
     account.new()
