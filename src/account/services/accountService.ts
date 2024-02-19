@@ -29,4 +29,10 @@ export class AccountService {
 
     return response
   }
+
+  public async getDuplicatedFields(account: Account): Promise<Array<keyof Account>> {
+    const duplicated = await this.accountRepository.getDuplicatedFields(account)
+
+    return duplicated
+  }
 }

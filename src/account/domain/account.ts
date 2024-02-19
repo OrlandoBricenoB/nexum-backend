@@ -6,10 +6,11 @@ export class Account extends Entity {
   public password: string
   public email: string
   public image: string
-  public is_verified: string
-  private privateFields: string[] = ['password']
+  public is_verified: boolean
+  private static privateFields: string[] = ['password']
+  private static uniqueFields: string[] = ['email', 'username']
 
-  constructor(id: string, username: string, password: string, email: string, image: string, is_verified: string) {
+  constructor(id: string, username: string, password: string, email: string, image: string, is_verified: boolean) {
     super()
 
     this.id = id
@@ -21,6 +22,10 @@ export class Account extends Entity {
   }
 
   protected getPrivateFields(): string[] {
-    return this.privateFields
+    return Account.privateFields
+  }
+
+  public getUniqueFields(): string[] {
+    return Account.uniqueFields
   }
 }

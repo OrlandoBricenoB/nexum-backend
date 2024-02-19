@@ -8,5 +8,6 @@ const router = Router()
 router.get('/', VerifyAuthentication, accountController.getAccount)
 router.get('/sessions', VerifyAuthentication, accountController.getAccountSessions)
 router.post('/selectCharacter', VerifyAuthentication, accountController.selectSessionCharacter)
+router.post('/create', accountController.createAccount)
 
 export const AccountsRouter = router

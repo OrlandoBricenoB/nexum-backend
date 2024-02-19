@@ -32,4 +32,10 @@ export class Entity {
   public getInfo(): Partial<this> {
     return omit({ ...this }, this.getPrivateFields()) as Partial<this>
   }
+
+  public isComplete(): boolean {
+    const values = Object.values(this)
+
+    return !values.includes(undefined) && !values.includes(null)
+  }
 }
