@@ -5,7 +5,7 @@ import { TcpClient } from './tcp-client/services/tcpClient'
 config()
 
 const server = new ExpressServer()
-const tcpClient = new TcpClient('localhost', 3500)
+const tcpClient = new TcpClient()
 const app = server.getApp()
 
 registerRoutes(app)
