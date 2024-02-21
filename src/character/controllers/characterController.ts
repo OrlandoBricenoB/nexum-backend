@@ -38,7 +38,7 @@ export class CharacterController extends ControllerBase {
       const data = req.body as Partial<Character>
 
       const character = Character.create(data) as Character
-      character.new()
+      character.generateID()
 
       await this.characterService.createCharacter(character)
       res.json(character.getInfo())

@@ -17,7 +17,7 @@ export class Entity {
     return empty
   }
 
-  public new(): void {
+  public generateID(): void {
     this.id = uuid()
   }
 

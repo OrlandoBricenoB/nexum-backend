@@ -42,7 +42,7 @@ export default class AccountController extends ControllerBase {
 
     const account = Account.create(data) as Account
 
-    account.new()
+    account.generateID()
 
     if (!account.isComplete()) {
       const error = new BadRequest()
