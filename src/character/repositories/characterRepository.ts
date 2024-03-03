@@ -15,7 +15,11 @@ export class CharacterRepository extends RepositoryBase<Character> {
     return this.getByID(id)
   }
 
-  public async createCharacter(data: Partial<Character>) {
+  public async createCharacter(data: Partial<Character>): Promise<boolean> {
     return this.create(data)
+  }
+
+  public async deleteCharacter(id: string): Promise<boolean> {
+    return this.delete(id)
   }
 }

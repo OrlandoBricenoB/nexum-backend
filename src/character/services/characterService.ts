@@ -29,4 +29,14 @@ export class CharacterService {
 
     return allAccountCharacters.map(character => Character.create(character)) as Character[]
   }
+
+  public async deleteCharacter(id: string): Promise<boolean> {
+    return this.characterRepository.deleteCharacter(id)
+  }
+
+  public async existsCharacter(id: string): Promise<boolean> {
+    const character = this.characterRepository.getCharacter(id)
+
+    return character !== null
+  }
 }

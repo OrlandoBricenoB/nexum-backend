@@ -8,5 +8,6 @@ const router = Router()
 router.get('/', VerifyAuthentication, characterController.getAllCharacters)
 router.get('/getAllByAccount', VerifyAuthentication, characterController.getCharactersByAccount)
 router.get('/:id', VerifyAuthentication, characterController.getCharacter)
+router.delete('/:id', VerifyAuthentication, characterController.deleteCharacter)
 
 export const CharacterRoutes = router

@@ -53,4 +53,23 @@ export class CharacterController extends ControllerBase {
     const characters: Character[] = await this.characterService.getAllAccountCharacters(account.id)
     res.json(characters.map(character => character.getInfo()))
   }
+
+  public async deleteCharacter(req: Request, res: Response): Promise<void> {
+    const { character_id } = req.params
+
+    const existsCharacter = await this.characterService.existsCharacter(character_id)
+
+    if (!existsCharacter) {
+      const error = new NotFound('CHARACTER_NOT_FOUND')
+
+      res.status(error.status).send({ error })
+
+      return
+    }
+
+    const ok = await this.characterService.deleteCharacter(character_id)
+    const message = ok ? 'Character deleted succesfully' : 'Something went wrong'
+
+    res.json({ ok, message })
+  }
 }
