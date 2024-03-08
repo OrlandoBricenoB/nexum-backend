@@ -41,24 +41,18 @@ export default class AccountController extends ControllerBase {
     data.is_verified = false
 
     const account = Account.create(data) as Account
-
     account.generateID()
 
     if (!account.isComplete()) {
       const error = new BadRequest()
-
       res.status(error.status).send({ error })
-
       return
     }
 
     const duplicated = await this.accountService.getDuplicatedFields(account)
-
     if (duplicated.length > 0) {
       const error = new DuplicatedError(duplicated)
-
       res.status(error.status).send({ error })
-
       return
     }
 
@@ -72,9 +66,7 @@ export default class AccountController extends ControllerBase {
 
     if (isEmpty(character_id)) {
       const error = new BadRequest()
-
       res.status(error.status).send({ error })
-
       return
     }
 
