@@ -76,7 +76,6 @@ export class AuthController extends ControllerBase {
 
         res.json({
           ok: true,
-          account,
           sessionId: isEmpty(existentSession) ? sessionId : existentSession?.id
         })
       } else {
