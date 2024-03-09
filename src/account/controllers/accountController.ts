@@ -39,6 +39,7 @@ export default class AccountController extends ControllerBase {
 
     data.username = data.username?.toLowerCase().trim()
     data.is_verified = false
+    data.image = ''
 
     const account = Account.create(data) as Account
     account.generateID()
