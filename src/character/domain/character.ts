@@ -7,10 +7,11 @@ export class Character extends Entity {
   public name: string
   public kingdom: string
   public division: string
+  public slot: number
 
-  public static fields: string[] = ['id', 'account_id', 'name', 'kingdom', 'division']
+  public static fields: string[] = ['id', 'account_id', 'name', 'kingdom', 'division', 'slot']
 
-  constructor(id: string, account_id: string, name: string, kingdom: string, division: string) {
+  constructor(id: string, account_id: string, name: string, kingdom: string, division: string, slot: number) {
     super()
 
     this.id = id
@@ -18,9 +19,10 @@ export class Character extends Entity {
     this.name = name
     this.kingdom = kingdom
     this.division = division
+    this.slot = slot
   }
 
   public static getUniqueFields() {
-    return pick(Character.fields, ['id', 'account_id', 'name'])
+    return pick(Character.fields, ['id', 'name'])
   }
 }
