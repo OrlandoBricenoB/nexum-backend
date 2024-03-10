@@ -14,7 +14,11 @@ export class CharacterPastLifeRepository extends RepositoryBase<CharacterPastLif
     return this.getByID(id)
   }
 
-  public async createCharactePastLife(data: Partial<CharacterPastLife>): Promise<boolean> {
+  public async createCharacterPastLife(data: Partial<CharacterPastLife>): Promise<boolean> {
     return this.create(data)
+  }
+
+  public async deleteCharacterPastLife(id: string): Promise<boolean> {
+    return this.delete(id)
   }
 }

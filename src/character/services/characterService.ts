@@ -9,9 +9,8 @@ export class CharacterService {
   }
 
   public async getAllCharacters(): Promise<Character[]> {
-    const allCharacters = await this.characterRepository.getAllCharacters()
-
-    return allCharacters.map(character => Character.create(character)) as Character[]
+    const characters = await this.characterRepository.getAllCharacters()
+    return characters.map(character => Character.create(character)) as Character[]
   }
 
   public async getCharacter(id: string): Promise<Character | null> {
@@ -22,6 +21,11 @@ export class CharacterService {
 
   public async createCharacter(data: Partial<Character>): Promise<boolean> {
     return this.characterRepository.createCharacter(data)
+  }
+
+  public async updateCharacter(data: Partial<Character>): Promise<Character | null> {
+    const character = await this.characterRepository.updateCharacter(data)
+    return character
   }
 
   public async getAllAccountCharacters(account_id: string): Promise<Character[]> {
@@ -38,5 +42,11 @@ export class CharacterService {
     const character = this.characterRepository.getCharacter(id)
 
     return character !== null
+  }
+
+  public async getDuplicatedFields(character: Character): Promise<Array<keyof Character>> {
+    const duplicated = await this.characterRepository.getDuplicatedFields(character)
+
+    return duplicated
   }
 }

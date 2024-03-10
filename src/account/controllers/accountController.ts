@@ -58,7 +58,6 @@ export default class AccountController extends ControllerBase {
     }
 
     await this.accountService.createAccount(account)
-
     res.status(201).send(account.getInfo())
   }
 

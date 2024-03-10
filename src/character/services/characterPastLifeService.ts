@@ -23,6 +23,6 @@ export class CharacterPastLifeService {
   }
 
   public async createCharacterPastLife(data: Partial<CharacterPastLife>): Promise<boolean> {
-    return this.characterPastLifeRepository.createCharactePastLife(data)
+    return this.characterPastLifeRepository.createCharacterPastLife(data)
   }
 }
