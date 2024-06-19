@@ -4,6 +4,7 @@ import { serve } from '@hono/node-server'
 import { connect, database } from '../../config/databaseConfig'
 import { CharacterService } from '../../character/services/characterService'
 import { BlankEnv, BlankSchema } from 'hono/types'
+import { AccountService } from '../../account/services/accountService'
 
 export type HonoApp = Hono<BlankEnv, BlankSchema, '/'>
 
@@ -31,8 +32,11 @@ export class HonoServer {
       })
       console.log(`Server running on port ${port}`)
       if (database) {
+        const accountService = new AccountService()
+        const accounts = await accountService.getAccounts()
         const characterService = new CharacterService()
         const characters = await characterService.getAllCharacters()
+        console.log({ accounts })
         console.log({ characters })
       }
     } catch (error) {

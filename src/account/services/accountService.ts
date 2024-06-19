@@ -9,6 +9,11 @@ export class AccountService {
     this.accountRepository = new AccountRepository()
   }
 
+  public async getAccounts() {
+    const account = await this.accountRepository.getAccounts()
+    return account as unknown as Array<EntitiesReturnType['Account']>
+  }
+
   public async getAccount(id: string) {
     const account = await this.accountRepository.getAccount(id)
     return account as unknown as EntitiesReturnType['Account']

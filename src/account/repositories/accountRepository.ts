@@ -2,10 +2,16 @@ import { sql } from 'drizzle-orm'
 import { accounts } from '../../shared/domain/domains'
 import { Account, AccountData } from '../../shared/domain/entities/accounts/Account'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
+import { database } from '../../config/databaseConfig'
 
 export class AccountRepository extends RepositoryBase<'Account'> {
   constructor() {
     super(accounts, Account)
+  }
+
+  public async getAccounts() {
+    const results = await database.select().from(accounts).execute()
+    return results.map((result) => Account(result))
   }
 
   public async getAccount(id: string) {
