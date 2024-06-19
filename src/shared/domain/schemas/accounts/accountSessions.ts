@@ -10,14 +10,10 @@ export const accountSessions = pgTable('account_sessions', {
     })
     .notNull(),
   name: text('name').notNull(),
-  userAgent: text('user_agent').notNull(),
   ip: text('ip').notNull().default(''),
-  location: text('location').notNull(),
-  characterId: uuid('character_id')
-    .references(() => characters.id, {
-      onDelete: 'set null',
-    })
-    .notNull(),
+  characterId: uuid('character_id').references(() => characters.id, {
+    onDelete: 'set null',
+  }),
   lastSeenAt: timestamp('last_seen_at').notNull().defaultNow(),
   expiredAt: timestamp('expired_at').notNull().defaultNow(),
   createdAt: timestamp('created_at').notNull().defaultNow(),

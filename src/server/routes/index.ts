@@ -8,11 +8,12 @@ import { Hono } from 'hono'
 
 export function registerRoutes(app: HonoApp): void {
   const router = new Hono()
-  app.route('/api/v1', router)
 
   router.route('/auth', AuthRouter)
   router.route('/accounts', AccountsRouter)
   router.route('/characters', CharacterRoutes)
   router.route('/past-lifes', CharacterPastLifeRouter)
   router.route('/tcp-requests', TcpRequestRouter)
+
+  app.route('/api/v1', router)
 }

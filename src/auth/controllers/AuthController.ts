@@ -51,24 +51,20 @@ export class AuthController extends ControllerBase {
         }
 
         // * Make Account Session
-        const userAgent = ctx.req.header('User-Agent') || ''
         const ip = ctx.req.header('X-Client-IP') || ''
 
         const [existentSession] = await this.accountSessionService.getSessions({
           accountId: account.id,
           ip,
-          userAgent: userAgent,
         })
         let sessionId = existentSession?.id || ''
 
         if (isEmpty(existentSession)) {
           const createdSession = await this.accountSessionService.createSession({
             ip,
-            userAgent: userAgent || '',
             expiredAt: new Date(Date.now() + 86400000), // 1 day of expiration
             lastSeenAt: new Date(),
             accountId: account.id,
-            location: '',
             name: '',
           })
           sessionId = createdSession.id

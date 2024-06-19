@@ -20,17 +20,11 @@ export class AccountSessionRepository extends RepositoryBase<'AccountSession'> {
     return this.getById(id)
   }
 
-  public async getSessions(data: Pick<AccountSessionData, 'accountId' | 'ip' | 'userAgent'>) {
+  public async getSessions(data: Pick<AccountSessionData, 'accountId' | 'ip'>) {
     const results = await database
       .select()
       .from(accountSessions)
-      .where(
-        and(
-          eq(accountSessions.accountId, data.accountId),
-          eq(accountSessions.ip, data.ip),
-          eq(accountSessions.userAgent, data.userAgent)
-        )
-      )
+      .where(and(eq(accountSessions.accountId, data.accountId), eq(accountSessions.ip, data.ip)))
       .execute()
 
     return results.map((session) => AccountSession(session))

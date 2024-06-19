@@ -14,7 +14,7 @@ export default class AccountSessionService {
     return accountSession as unknown as EntitiesReturnType['AccountSession']
   }
 
-  public async getSessions(data: Pick<AccountSessionData, 'accountId' | 'ip' | 'userAgent'>) {
+  public async getSessions(data: Pick<AccountSessionData, 'accountId' | 'ip'>) {
     const allSessions = await this.accountSessionRepository.getSessions(data)
     return allSessions as unknown as Array<EntitiesReturnType['AccountSession']>
   }

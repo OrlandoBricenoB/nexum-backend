@@ -4,9 +4,7 @@ export type AccountSessionData = {
   id: string
   accountId: string
   name: string
-  userAgent: string
   ip: string
-  location: string
   characterId: string
   lastSeenAt: Date
   expiredAt: Date
@@ -22,9 +20,7 @@ export function AccountSession(values: Partial<AccountSessionData>) {
     id: values.id || '',
     accountId: values.accountId || '',
     name: values.name || '',
-    userAgent: values.userAgent || '',
     ip: values.ip || '',
-    location: values.location || '',
     characterId: values.characterId || '',
     lastSeenAt: values.lastSeenAt ? new Date(values.lastSeenAt) : new Date(),
     expiredAt: values.expiredAt ? new Date(values.expiredAt) : new Date(),
