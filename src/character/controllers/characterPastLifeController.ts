@@ -1,6 +1,7 @@
 import { ControllerBase } from '../../shared/domain/controllerBase'
 import { CharacterPastLifeService } from '../services/characterPastLifeService'
 import { NotFound } from '../../shared/errors/customErrors'
+import { HonoContext } from '../../server/types/HonoContext'
 
 export class CharacterPastLifeController extends ControllerBase {
   private characterPastLifeService: CharacterPastLifeService
@@ -11,25 +12,30 @@ export class CharacterPastLifeController extends ControllerBase {
     this.characterPastLifeService = new CharacterPastLifeService()
   }
 
-  public async getAllCharacterPastLifes(req: Request, res: Response): Promise<void> {
-    const { character_id: characterId } = req.body as { character_id: number }
+  public async getAllCharacterPastLifes(ctx: HonoContext<'/'>) {
+    const characterId = ctx.get('characterId')
 
     const characterPastLifes =
       await this.characterPastLifeService.getAllCharacterPastLifes(characterId)
 
-    res.json(characterPastLifes.map((pastLife) => pastLife.getInfo()))
+    return ctx.json(characterPastLifes.map((pastLife) => pastLife.getInfo()))
   }
 
-  public async getCharacterPastLife(req: Request, res: Response): Promise<void> {
-    const { id } = req.params
+  public async getCharacterPastLife(ctx: HonoContext<'/:id'>) {
+    const id = ctx.req.param('id')
 
     const characterPastLife = await this.characterPastLifeService.getCharacterPastLife(id)
 
     if (characterPastLife) {
-      res.json(characterPastLife.getInfo())
+      return ctx.json(characterPastLife.getInfo())
     } else {
       const notFoundError = new NotFound('CHARACTER_PAST_LIFE_NOT_FOUND')
-      res.status(notFoundError.status).send({ error: notFoundError })
+      return ctx.json(
+        {
+          error: notFoundError,
+        },
+        notFoundError.status
+      )
     }
   }
 }

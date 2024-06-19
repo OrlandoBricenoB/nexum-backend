@@ -13,11 +13,22 @@ import {
   CharacterAppearance,
   CharacterAppearanceData,
 } from '../../shared/domain/entities/characters/CharacterAppearance'
-import { AccountData } from '../../shared/domain/entities/accounts/Account'
-import { CharacterStats } from '../../shared/domain/entities/characters/stats/CharacterStats'
-import { CharacterHealthStats } from '../../shared/domain/entities/characters/stats/CharacterHealthStats'
-import { CharacterMurderStats } from '../../shared/domain/entities/characters/stats/CharacterMurderStats'
-import { CharacterWallet } from '../../shared/domain/entities/characters/inventory/CharacterWallet'
+import {
+  CharacterStats,
+  CharacterStatsData,
+} from '../../shared/domain/entities/characters/stats/CharacterStats'
+import {
+  CharacterHealthStats,
+  CharacterHealthStatsData,
+} from '../../shared/domain/entities/characters/stats/CharacterHealthStats'
+import {
+  CharacterMurderStats,
+  CharacterMurderStatsData,
+} from '../../shared/domain/entities/characters/stats/CharacterMurderStats'
+import {
+  CharacterWallet,
+  CharacterWalletData,
+} from '../../shared/domain/entities/characters/inventory/CharacterWallet'
 
 export class CharacterController extends ControllerBase {
   private characterService: CharacterService
@@ -44,20 +55,24 @@ export class CharacterController extends ControllerBase {
   }
 
   public async getCharacter(ctx: HonoContext<'/:id'>) {
-    const id = req.params.id
-    const { full } = req.query
+    const id = ctx.req.param('id')
+    const { full } = ctx.req.query()
 
+    // TODO: El sql de getCharacters debe traer todas las tablas correspondientes.
+    // TODO: Si tiene el query full, dará todo, sino, solo apariencia y data principal de character.
     const character = await this.characterService.getCharacter(id)
 
     if (character) {
       const appearance = await this.characterAppearanceService.getCharacterAppearance(id)
-      let data = {
+      let data: Partial<CharacterData> & {
+        appearance: Partial<CharacterAppearanceData>
+        stats?: Partial<CharacterStatsData>
+        healthStats?: Partial<CharacterHealthStatsData>
+        murderStats?: Partial<CharacterMurderStatsData>
+        wallet?: Partial<CharacterWalletData>
+      } = {
         ...character.getInfo(),
-        appearance: appearance ? appearance.getInfo() : null,
-        stats: null,
-        healthStats: null,
-        murderStats: null,
-        wallet: null,
+        appearance: appearance.getInfo(),
       }
 
       if (full) {
@@ -92,10 +107,10 @@ export class CharacterController extends ControllerBase {
         character: Pick<CharacterData, 'name' | 'clan' | 'slot'>
         appearance: Partial<CharacterAppearanceData>
       }
-      const account = req.body?._account as AccountData
+      const accountId = ctx.get('accountId')
 
       const character = Character(data)
-      character.accountId = account.id
+      character.accountId = accountId
       character.kingdom = KINGDOMS_FROM_CLANS[character.clan as 'omnivisus']
       character.division = character.division || ''
       character.profession = character.profession || ''
@@ -187,28 +202,33 @@ export class CharacterController extends ControllerBase {
     }
   }
 
-  public async getCharactersByAccount(ctx: HonoContext<'/getAllByAccount'>): Promise<void> {
-    const { _account } = (await ctx.req.json()) as { _account: AccountData }
+  public async getCharactersByAccount(ctx: HonoContext<'/getAllByAccount'>) {
+    const accountId = ctx.get('accountId')
 
-    const characters = await this.characterService.getAllAccountCharacters(_account.id)
+    const characters = await this.characterService.getAllAccountCharacters(accountId)
+    const charactersData: Array<
+      Partial<CharacterData> & {
+        stats: Partial<CharacterStatsData>
+      }
+    > = []
     for (let i = 0; i < characters.length; i++) {
       const character = characters[i]
       if (!character || !character.id) continue
 
       const stats = await this.characterStatsService.getCharacterStats(character.id)
-      characters[i] = {
+      charactersData.push({
         ...character.getInfo(),
-        stats: stats ? stats.getInfo() : null,
-      }
+        stats: stats.getInfo(),
+      })
     }
 
-    return ctx.json(characters)
+    return ctx.json(charactersData)
   }
 
   public async deleteCharacter(ctx: HonoContext<'/delete'>) {
-    const { character_id } = req.params
+    const characterId = ctx.get('characterId')
 
-    const existsCharacter = await this.characterService.existsCharacter(character_id)
+    const existsCharacter = await this.characterService.existsCharacter(characterId)
 
     if (!existsCharacter) {
       const error = new NotFound('CHARACTER_NOT_FOUND')
@@ -221,7 +241,7 @@ export class CharacterController extends ControllerBase {
       )
     }
 
-    await this.characterService.deleteCharacter(character_id)
+    await this.characterService.deleteCharacter(characterId)
 
     return ctx.json({
       ok: true,
