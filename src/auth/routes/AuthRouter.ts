@@ -1,8 +1,8 @@
-import { Router } from 'express'
 import { AuthController } from '../controllers/AuthController'
+import { Hono } from 'hono'
 
+const router = new Hono()
 const authController = new AuthController()
-const router = Router()
 
 router.post('/login', authController.login)
 

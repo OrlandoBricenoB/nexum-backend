@@ -1,5 +1,7 @@
+import { StatusCode } from 'hono/utils/http-status'
+
 export class BadRequest extends Error {
-  status: number
+  status: StatusCode
 
   constructor() {
     super()
@@ -10,7 +12,7 @@ export class BadRequest extends Error {
 }
 
 export class Unauthorized extends Error {
-  status: number
+  status: StatusCode
 
   constructor(message = '') {
     super()
@@ -22,7 +24,7 @@ export class Unauthorized extends Error {
 
 export class DuplicatedError extends Error {
   fields: string[] = []
-  status: number
+  status: StatusCode
 
   constructor(fields: string[]) {
     super()
@@ -34,7 +36,7 @@ export class DuplicatedError extends Error {
 }
 
 export class NotFound extends Error {
-  status: number
+  status: StatusCode
 
   constructor(message = '') {
     super()
@@ -45,7 +47,7 @@ export class NotFound extends Error {
 }
 
 export class ServerError extends Error {
-  status: number
+  status: StatusCode
 
   constructor(message = '') {
     super()

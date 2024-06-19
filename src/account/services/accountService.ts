@@ -1,7 +1,6 @@
-import { isEmpty } from 'lodash'
-import { Account } from '../domain/account'
 import { AccountRepository } from '../repositories/accountRepository'
-import { FindQuery } from '../../server/domain/FindQuery'
+import { Account, AccountData } from '../../shared/domain/entities/accounts/Account'
+import { EntitiesReturnType } from '../../shared/types/Entities'
 
 export class AccountService {
   private accountRepository: AccountRepository
@@ -10,29 +9,23 @@ export class AccountService {
     this.accountRepository = new AccountRepository()
   }
 
-  public async getAccounts(query: FindQuery<Account>): Promise<Account | null> {
-    const accounts = await this.accountRepository.getAccounts(query)
-
-    if (!accounts || isEmpty(accounts)) return null
-
-    return Account.create(accounts[0])
-  }
-
-  public async getAccount(id: string): Promise<Account | null> {
+  public async getAccount(id: string) {
     const account = await this.accountRepository.getAccount(id)
-
-    return Account.create(account)
+    return account as unknown as EntitiesReturnType['Account']
   }
 
-  public async createAccount(data: Partial<Account>): Promise<boolean> {
+  public async getAccountByUsername(username: string): Promise<EntitiesReturnType['Account']> {
+    const [account] = await this.accountRepository.getAccountByUsername(username)
+    return account as unknown as EntitiesReturnType['Account']
+  }
+
+  public async createAccount(data: Partial<AccountData>) {
     const response = await this.accountRepository.createAccount(data)
-
-    return response
+    return response as unknown as EntitiesReturnType['Account']
   }
 
-  public async getDuplicatedFields(account: Account): Promise<Array<keyof Account>> {
+  public async getDuplicatedFields(account: ReturnType<typeof Account>) {
     const duplicated = await this.accountRepository.getDuplicatedFields(account)
-
     return duplicated
   }
 }

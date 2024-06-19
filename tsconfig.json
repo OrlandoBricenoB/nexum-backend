@@ -1,23 +1,21 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "target": "es6",
-    "noImplicitAny": true,
+    /* Language and Environment */
+    "target": "ESNext" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
+    "lib": [
+      "ESNext"
+    ] /* Specify a set of bundled library declaration files that describe the target runtime environment. */,
+    "module": "es2022",
     "moduleResolution": "node",
-    "sourceMap": false,
-    "rootDir": ".",
     "strict": true,
-    "noEmit": false,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "allowJs": true,
+    "checkJs": false,
     "resolveJsonModule": true,
-    "noUnusedLocals": true,
-    "outDir": "./dist",
-  },
-  "include": [
-    "src/**/**.ts",
-    "tests/**/**.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitThis": false
+  }
 }

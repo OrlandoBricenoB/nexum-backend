@@ -1,19 +1,25 @@
-import { RequestHandler } from 'express'
 import { Unauthorized } from '../../shared/errors/customErrors'
 import AccountSessionService from '../../account/services/accountSessionService'
 import { isEmpty } from 'lodash'
 import { AccountService } from '../../account/services/accountService'
+import { HonoContext } from '../../server/types/HonoContext'
+import { Next } from 'hono'
 
-export const VerifyAuthentication: RequestHandler = async (req, res, next) => {
-  const authorization = req.headers.authorization as string
+export const VerifyAuthentication = async (ctx: HonoContext<'/verify'>, next: Next) => {
+  const authorization = ctx.req.header('Authorization') || ''
+
   const sessionId = (authorization || '').split('Bearer ').pop()?.trim()
   console.log({ sessionId })
+
   if (!sessionId || sessionId === 'null' || sessionId === 'undefined') {
     const unauthorizedError = new Unauthorized('NEED_SESSION')
-    res.status(unauthorizedError.status).json({
-      error: unauthorizedError
-    })
-    return
+    return ctx.json(
+      {
+        ok: false,
+        error: unauthorizedError,
+      },
+      unauthorizedError.status
+    )
   }
 
   const sesssionAccountService = new AccountSessionService()
@@ -21,39 +27,46 @@ export const VerifyAuthentication: RequestHandler = async (req, res, next) => {
 
   if (isEmpty(session)) {
     const unauthorizedError = new Unauthorized('ERROR_INVALID_SESSION')
-    res.status(unauthorizedError.status).json({
-      error: unauthorizedError
-    })
-    return
+    return ctx.json(
+      {
+        ok: false,
+        error: unauthorizedError,
+      },
+      unauthorizedError.status
+    )
   }
 
   // * Refresh last seen after 2 minutes from the last update.
-  const lastSeenWithExtra = new Date(session.last_seen_at).getTime() + 120000
+  const lastSeenWithExtra = new Date(session.lastSeenAt).getTime() + 120000
 
   // * If Date.now() is after last seen with extra time, refresh last seen.
   if (new Date().getTime() - lastSeenWithExtra) {
     const updatedSession = {
-      expired_at: new Date(Date.now() + 86400000),
-      last_seen_at: new Date()
+      expiredAt: new Date(Date.now() + 86400000),
+      lastSeenAt: new Date(),
     }
     await sesssionAccountService.updateSession(updatedSession)
 
-    session.expired_at = new Date(Date.now() + 86400000)
-    session.last_seen_at = new Date()
+    session.expiredAt = new Date(Date.now() + 86400000)
+    session.lastSeenAt = new Date()
   }
 
   const accountService = new AccountService()
-  const account = await accountService.getAccount(session.account_id)
+  const account = await accountService.getAccount(session.accountId)
 
   if (isEmpty(account)) {
     const unauthorizedError = new Unauthorized('ERROR_INVALID_SESSION')
-    res.status(unauthorizedError.status).json({
-      error: unauthorizedError
-    })
-    return
+    return ctx.json(
+      {
+        ok: false,
+        error: unauthorizedError,
+      },
+      unauthorizedError.status
+    )
   }
 
-  req.body._account = account
-  req.body._sessionId = session.id
+  ctx.set('account', account)
+  ctx.set('sessionId', session.id)
+  ctx.set('characterId', session.characterId)
   next()
 }

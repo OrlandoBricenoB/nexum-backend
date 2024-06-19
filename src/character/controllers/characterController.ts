@@ -1,20 +1,23 @@
-import { Request, Response } from 'express'
 import { CharacterService } from '../services/characterService'
-import { Character } from '../domain/character'
 import { BadRequest, DuplicatedError, NotFound } from '../../shared/errors/customErrors'
 import { ControllerBase } from '../../shared/domain/controllerBase'
-import { Account } from '../../account/domain/account'
-import { CharacterStats } from '../domain/characterStats'
 import { CharacterStatsService } from '../services/characterStatsService'
 import { CharacterHealthStatsService } from '../services/characterHealthStatsService'
 import { CharacterMurderStatsService } from '../services/characterMurderStatsService'
-import { CharacterHealthStats } from '../domain/characterHealthStats'
-import { CharacterMurderStats } from '../domain/characterMurderStats'
-import { CharacterWallet } from '../domain/characterWallet'
 import { CharacterWalletService } from '../services/characterWalletService'
-import { CharacterAppearance } from '../domain/characterAppearance'
 import { CharacterAppearanceService } from '../services/characterAppearanceService'
-import { FullCharacter } from '../domain/fullCharacter'
+import { KINGDOMS_FROM_CLANS } from '../../shared/domain/Kingdoms'
+import { HonoContext } from '../../server/types/HonoContext'
+import { Character, CharacterData } from '../../shared/domain/entities/characters/Character'
+import {
+  CharacterAppearance,
+  CharacterAppearanceData,
+} from '../../shared/domain/entities/characters/CharacterAppearance'
+import { AccountData } from '../../shared/domain/entities/accounts/Account'
+import { CharacterStats } from '../../shared/domain/entities/characters/stats/CharacterStats'
+import { CharacterHealthStats } from '../../shared/domain/entities/characters/stats/CharacterHealthStats'
+import { CharacterMurderStats } from '../../shared/domain/entities/characters/stats/CharacterMurderStats'
+import { CharacterWallet } from '../../shared/domain/entities/characters/inventory/CharacterWallet'
 
 export class CharacterController extends ControllerBase {
   private characterService: CharacterService
@@ -35,13 +38,12 @@ export class CharacterController extends ControllerBase {
     this.characterWalletService = new CharacterWalletService()
   }
 
-  public async getAllCharacters(req: Request, res: Response): Promise<void> {
+  public async getAllCharacters(ctx: HonoContext<'/'>) {
     const characters = await this.characterService.getAllCharacters()
-
-    res.json(characters.map(character => character.getInfo()))
+    return ctx.json(characters.map((character) => character.getInfo()))
   }
 
-  public async getCharacter(req: Request, res: Response): Promise<void> {
+  public async getCharacter(ctx: HonoContext<'/:id'>) {
     const id = req.params.id
     const { full } = req.query
 
@@ -49,13 +51,13 @@ export class CharacterController extends ControllerBase {
 
     if (character) {
       const appearance = await this.characterAppearanceService.getCharacterAppearance(id)
-      let data: FullCharacter = {
+      let data = {
         ...character.getInfo(),
         appearance: appearance ? appearance.getInfo() : null,
         stats: null,
         healthStats: null,
         murderStats: null,
-        wallet: null
+        wallet: null,
       }
 
       if (full) {
@@ -68,91 +70,100 @@ export class CharacterController extends ControllerBase {
           stats,
           healthStats,
           murderStats,
-          wallet
+          wallet,
         }
       }
 
-      res.json(data)
+      return ctx.json(data)
     } else {
       const notFoundError = new NotFound('CHARACTER_NOT_FOUND')
-      res.status(notFoundError.status).send({ error: notFoundError })
+      return ctx.json(
+        {
+          error: notFoundError,
+        },
+        notFoundError.status
+      )
     }
   }
 
-  public async createCharacter(req: Request, res: Response): Promise<void> {
+  public async createCharacter(ctx: HonoContext<'/create'>) {
     try {
-      const { character: data, appearance } = req.body as {
-        character: Partial<Character>
-        appearance: Partial<CharacterAppearance>
+      const { character: data, appearance } = (await ctx.req.json()) as {
+        character: Pick<CharacterData, 'name' | 'clan' | 'slot'>
+        appearance: Partial<CharacterAppearanceData>
       }
-      const account = req.body?._account as Account
+      const account = req.body?._account as AccountData
 
-      const character = Character.create(data) as Character
-      character.account_id = account.id
+      const character = Character(data)
+      character.accountId = account.id
+      character.kingdom = KINGDOMS_FROM_CLANS[character.clan as 'omnivisus']
       character.division = character.division || ''
       character.profession = character.profession || ''
-      character.generateID()
 
       if (!character.isComplete()) {
+        console.log('Is not complete')
         const error = new BadRequest()
-        res.status(error.status).send({ error })
-        return
+        return ctx.json(
+          {
+            error,
+          },
+          error.status
+        )
       }
 
       const duplicated = await this.characterService.getDuplicatedFields(character)
       if (duplicated.length > 0) {
         const error = new DuplicatedError(duplicated)
-        res.status(error.status).send({ error })
-        return
+        return ctx.json(
+          {
+            error,
+          },
+          error.status
+        )
       }
 
       // * Default values for character
-      const stats = CharacterStats.create({
-        character_id: character.id,
+      const stats = CharacterStats({
+        characterId: character.id,
         level: 1,
         exp: 0,
         rebirths: 0,
-        skill_points: 0,
-        element_points: 0,
-        rebirth_points: 0,
-        rank: 0
-      }) as CharacterStats
-      stats.generateID()
+        skillPoints: 0,
+        elementPoints: 0,
+        rebirthPoints: 0,
+        rank: '',
+      })
 
-      const healthStats = CharacterHealthStats.create({
-        character_id: character.id,
-        vitality: 0,
-        stamina: 0,
-        mana: 0,
-        mana_reserve: 0
-      }) as CharacterHealthStats
-      healthStats.generateID()
+      const healthStats = CharacterHealthStats({
+        characterId: character.id,
+        vitality: '0.00',
+        stamina: '0.00',
+        mana: '0.00',
+        manaReserve: '0.00',
+      })
 
-      const murderStats = CharacterMurderStats.create({
-        character_id: character.id,
+      const murderStats = CharacterMurderStats({
+        characterId: character.id,
         honor: 0,
-        death_count: 0,
+        deathCount: '0.00',
         kills: 0,
         deaths: 0,
-        assists: 0
-      }) as CharacterMurderStats
-      murderStats.generateID()
+        assists: 0,
+      })
 
-      const charAppearance = CharacterAppearance.create({
-        character_id: character.id,
-        skin_tone: appearance.skin_tone,
+      const charAppearance = CharacterAppearance({
+        characterId: character.id,
+        skinTone: appearance.skinTone,
         hairstyle: appearance.hairstyle,
         facestyle: appearance.facestyle,
-        gender: appearance.gender
-      }) as CharacterAppearance
-      charAppearance.generateID()
+        gender: appearance.gender,
+      })
 
-      const wallet = CharacterWallet.create({
-        character_id: character.id,
+      const wallet = CharacterWallet({
+        characterId: character.id,
         hesedias: 50,
-        nexum_coins: 0
-      }) as CharacterWallet
-      wallet.generateID()
+        nexumCoins: 0,
+      })
 
       // * Create data
       await this.characterService.createCharacter(character)
@@ -162,20 +173,39 @@ export class CharacterController extends ControllerBase {
       await this.characterAppearanceService.createCharacterAppearance(charAppearance)
       await this.characterWalletService.createCharacterWallet(wallet)
 
-      res.status(201).send(character.getInfo())
+      console.log('Created', character.getInfo())
+
+      return ctx.json(character.getInfo())
     } catch (error) {
-      res.status(500).json(error)
+      console.log(error)
+      return ctx.json(
+        {
+          error,
+        },
+        500
+      )
     }
   }
 
-  public async getCharactersByAccount(req: Request, res: Response): Promise<void> {
-    const { _account } = req.body as { _account: Account }
+  public async getCharactersByAccount(ctx: HonoContext<'/getAllByAccount'>): Promise<void> {
+    const { _account } = (await ctx.req.json()) as { _account: AccountData }
 
-    const characters: Character[] = await this.characterService.getAllAccountCharacters(_account.id)
-    res.json(characters.map(character => character.getInfo()))
+    const characters = await this.characterService.getAllAccountCharacters(_account.id)
+    for (let i = 0; i < characters.length; i++) {
+      const character = characters[i]
+      if (!character || !character.id) continue
+
+      const stats = await this.characterStatsService.getCharacterStats(character.id)
+      characters[i] = {
+        ...character.getInfo(),
+        stats: stats ? stats.getInfo() : null,
+      }
+    }
+
+    return ctx.json(characters)
   }
 
-  public async deleteCharacter(req: Request, res: Response): Promise<void> {
+  public async deleteCharacter(ctx: HonoContext<'/delete'>) {
     const { character_id } = req.params
 
     const existsCharacter = await this.characterService.existsCharacter(character_id)
@@ -183,14 +213,19 @@ export class CharacterController extends ControllerBase {
     if (!existsCharacter) {
       const error = new NotFound('CHARACTER_NOT_FOUND')
 
-      res.status(error.status).send({ error })
-
-      return
+      return ctx.json(
+        {
+          error,
+        },
+        error.status
+      )
     }
 
-    const ok = await this.characterService.deleteCharacter(character_id)
-    const message = ok ? 'Character deleted succesfully' : 'Something went wrong'
+    await this.characterService.deleteCharacter(character_id)
 
-    res.json({ ok, message })
+    return ctx.json({
+      ok: true,
+      message: 'Character deleted succesfully',
+    })
   }
 }

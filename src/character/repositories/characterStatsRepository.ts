@@ -1,27 +1,37 @@
+import { eq } from 'drizzle-orm'
+import {
+  CharacterStats,
+  CharacterStatsData,
+} from '../../shared/domain/entities/characters/stats/CharacterStats'
+import { characterStats } from '../../shared/domain/schemas/characters/stats/characterStats'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
-import { CharacterStats } from '../domain/characterStats'
+import { database } from '../../config/databaseConfig'
 
-export class CharacterStatsRepository extends RepositoryBase<CharacterStats> {
+export class CharacterStatsRepository extends RepositoryBase<'CharacterStats'> {
   constructor() {
-    super('character_stats')
+    super(characterStats, CharacterStats)
   }
 
-  public async getCharacterStats(characterId: string): Promise<CharacterStats[]> {
-    return this.getAll({
-      character_id: characterId
-    })
+  public async getCharacterStats(characterId: string) {
+    const [result] = await database
+      .select()
+      .from(characterStats)
+      .where(eq(characterStats.characterId, characterId))
+      .limit(1)
+      .execute()
+    return CharacterStats(result)
   }
 
-  public async createCharacterStats(data: Partial<CharacterStats>): Promise<boolean> {
+  public async createCharacterStats(data: Partial<CharacterStatsData>) {
     return this.create(data)
   }
 
-  public async updateCharacterStats(data: Partial<CharacterStats>): Promise<CharacterStats | null> {
+  public async updateCharacterStats(data: Partial<CharacterStatsData>) {
     if (!data.id) return null
     return this.update(data.id, data)
   }
 
-  public async deleteCharacterStats(id: string): Promise<boolean> {
+  public async deleteCharacterStats(id: string) {
     return this.delete(id)
   }
 }

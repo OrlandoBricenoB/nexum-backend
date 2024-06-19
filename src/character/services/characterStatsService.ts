@@ -1,4 +1,5 @@
-import { CharacterStats } from '../domain/characterStats'
+import { CharacterStatsData } from '../../shared/domain/entities/characters/stats/CharacterStats'
+import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterStatsRepository } from '../repositories/characterStatsRepository'
 
 export class CharacterStatsService {
@@ -8,21 +9,23 @@ export class CharacterStatsService {
     this.characterStatsRepository = new CharacterStatsRepository()
   }
 
-  public async getCharacterStats(characterId: string): Promise<CharacterStats | null> {
+  public async getCharacterStats(characterId: string) {
     const data = await this.characterStatsRepository.getCharacterStats(characterId)
-    return data.length ? CharacterStats.create(data[0]) : null
+    return data as unknown as EntitiesReturnType['CharacterStats']
   }
 
-  public async createCharacterStats(data: Partial<CharacterStats>): Promise<boolean> {
-    return this.characterStatsRepository.createCharacterStats(data)
+  public async createCharacterStats(data: Partial<CharacterStatsData>) {
+    return this.characterStatsRepository.createCharacterStats(
+      data
+    ) as unknown as EntitiesReturnType['CharacterStats']
   }
 
-  public async updateCharacterStats(data: Partial<CharacterStats>): Promise<CharacterStats | null> {
+  public async updateCharacterStats(data: Partial<CharacterStatsData>) {
     const stats = await this.characterStatsRepository.updateCharacterStats(data)
-    return stats
+    return stats as unknown as EntitiesReturnType['CharacterStats']
   }
 
-  public async deleteCharacterStats(id: string): Promise<boolean> {
+  public async deleteCharacterStats(id: string) {
     return this.characterStatsRepository.deleteCharacterStats(id)
   }
 }

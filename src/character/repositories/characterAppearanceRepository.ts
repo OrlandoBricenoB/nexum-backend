@@ -1,27 +1,37 @@
+import { eq } from 'drizzle-orm'
+import { database } from '../../config/databaseConfig'
+import {
+  CharacterAppearance,
+  CharacterAppearanceData,
+} from '../../shared/domain/entities/characters/CharacterAppearance'
+import { characterAppearances } from '../../shared/domain/schemas/characters/characterAppearances'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
-import { CharacterAppearance } from '../domain/characterAppearance'
 
-export class CharacterAppearanceRepository extends RepositoryBase<CharacterAppearance> {
+export class CharacterAppearanceRepository extends RepositoryBase<'CharacterAppearance'> {
   constructor() {
-    super('character_appearances')
+    super(characterAppearances, CharacterAppearance)
   }
 
-  public async getCharacterAppearance(characterId: string): Promise<CharacterAppearance[]> {
-    return this.getAll({
-      character_id: characterId
-    })
+  public async getCharacterAppearance(characterId: string) {
+    const [result] = await database
+      .select()
+      .from(characterAppearances)
+      .where(eq(characterAppearances.characterId, characterId))
+      .limit(1)
+      .execute()
+    return CharacterAppearance(result)
   }
 
-  public async createCharacterAppearance(data: Partial<CharacterAppearance>): Promise<boolean> {
+  public async createCharacterAppearance(data: Partial<CharacterAppearanceData>) {
     return this.create(data)
   }
 
-  public async updateCharacterAppearance(data: Partial<CharacterAppearance>): Promise<CharacterAppearance | null> {
+  public async updateCharacterAppearance(data: Partial<CharacterAppearanceData>) {
     if (!data.id) return null
     return this.update(data.id, data)
   }
 
-  public async deleteCharacterAppearance(id: string): Promise<boolean> {
+  public async deleteCharacterAppearance(id: string) {
     return this.delete(id)
   }
 }

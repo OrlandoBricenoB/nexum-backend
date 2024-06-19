@@ -1,7 +1,7 @@
-import { Request, Response } from 'express'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 import { TcpClient } from '../services/tcpClient'
 import { CharacterService } from '../../character/services/characterService'
+import { HonoContext } from '../../server/types/HonoContext'
 
 export default class TcpRequestsController extends ControllerBase {
   private characterService: CharacterService
@@ -12,28 +12,28 @@ export default class TcpRequestsController extends ControllerBase {
     this.characterService = new CharacterService()
   }
 
-  public async getAllData(req: Request, res: Response): Promise<void> {
+  public async getAllData(ctx: HonoContext<'/'>) {
     // * TCP Client
     const tcpClient = new TcpClient()
     tcpClient.send({
-      data: 'all'
+      data: 'all',
     })
 
-    res.send('Done.')
+    return ctx.text('Done.')
   }
 
-  public async getCharactersByAccount(req: Request, res: Response): Promise<void> {
+  public async getCharactersByAccount(ctx: HonoContext<'/'>) {
     const tcpClient = new TcpClient()
 
-    const { account_id } = req.body as { account_id: string }
+    const { account_id: accountId } = (await ctx.req.json()) as { account_id: number }
 
-    const characters = await this.characterService.getAllAccountCharacters(account_id)
+    const characters = await this.characterService.getAllAccountCharacters(accountId)
 
     tcpClient.send({
       action: 'charactersByAccount',
-      data: characters
+      data: characters,
     })
 
-    res.send('Done.')
+    return ctx.text('Done.')
   }
 }

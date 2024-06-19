@@ -1,9 +1,9 @@
-import { Router } from 'express'
 import { CharacterPastLifeController } from '../controllers/characterPastLifeController'
 import { VerifyAuthentication } from '../../auth/middlewares/VerifyAuthentication'
+import { Hono } from 'hono'
 
 const characterPastLifeController = new CharacterPastLifeController()
-const router = Router()
+const router = new Hono()
 
 router.get('/', VerifyAuthentication, characterPastLifeController.getAllCharacterPastLifes)
 router.get('/:id', VerifyAuthentication, characterPastLifeController.getCharacterPastLife)

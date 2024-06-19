@@ -1,4 +1,5 @@
-import { CharacterWallet } from '../domain/characterWallet'
+import { CharacterWalletData } from '../../shared/domain/entities/characters/inventory/CharacterWallet'
+import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterWalletRepository } from '../repositories/characterWalletRepository'
 
 export class CharacterWalletService {
@@ -8,21 +9,23 @@ export class CharacterWalletService {
     this.characterWalletRepository = new CharacterWalletRepository()
   }
 
-  public async getCharacterWallet(characterId: string): Promise<CharacterWallet | null> {
+  public async getCharacterWallet(characterId: string) {
     const data = await this.characterWalletRepository.getCharacterWallet(characterId)
-    return data.length ? CharacterWallet.create(data[0]) : null
+    return data as unknown as EntitiesReturnType['CharacterWallet']
   }
 
-  public async createCharacterWallet(data: Partial<CharacterWallet>): Promise<boolean> {
-    return this.characterWalletRepository.createCharacterWallet(data)
+  public async createCharacterWallet(data: Partial<CharacterWalletData>) {
+    return this.characterWalletRepository.createCharacterWallet(
+      data
+    ) as unknown as EntitiesReturnType['CharacterWallet']
   }
 
-  public async updateCharacterWallet(data: Partial<CharacterWallet>): Promise<CharacterWallet | null> {
+  public async updateCharacterWallet(data: Partial<CharacterWalletData>) {
     const stats = await this.characterWalletRepository.updateCharacterWallet(data)
-    return stats
+    return stats as unknown as EntitiesReturnType['CharacterWallet']
   }
 
-  public async deleteCharacterWallet(id: string): Promise<boolean> {
+  public async deleteCharacterWallet(id: string) {
     return this.characterWalletRepository.deleteCharacterWallet(id)
   }
 }

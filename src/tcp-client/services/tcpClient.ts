@@ -23,14 +23,14 @@ export class TcpClient {
         .connect(
           {
             host: this.host,
-            port: this.port
+            port: this.port,
           },
           () => {
             console.log(`TCP Client connect on ${this.host}:${this.port}`)
             resolve(true)
           }
         )
-        .on('error', err => {
+        .on('error', (err) => {
           console.log('Cant connect with TCP server.')
           reject(err)
         })
@@ -38,13 +38,16 @@ export class TcpClient {
     return await connection
   }
 
-  public async send(data: { [key: string]: unknown }, cb?: (err: Error | undefined) => void): Promise<void> {
+  public async send(
+    data: { [key: string]: unknown },
+    cb?: (err: Error | undefined) => void
+  ): Promise<void> {
     this.connect()
       .then(() => {
         this.getClient().write(JSON.stringify(data), cb || (() => false))
         this.getClient().end()
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err)
       })
   }

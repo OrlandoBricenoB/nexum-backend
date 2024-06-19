@@ -7,7 +7,7 @@ export class ControllerBase {
     const controllerClass = this.constructor
     const keys = Object.getOwnPropertyNames(controllerClass.prototype)
 
-    keys.forEach(k => {
+    keys.forEach((k) => {
       const key = k as keyof this
 
       const value = this[key]

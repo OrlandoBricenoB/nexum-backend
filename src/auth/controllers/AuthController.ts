@@ -1,10 +1,9 @@
-import { Request, Response } from 'express'
 import { BadRequest, Unauthorized } from '../../shared/errors/customErrors'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 import { AccountService } from '../../account/services/accountService'
 import AccountSessionService from '../../account/services/accountSessionService'
-import { v4 } from 'uuid'
 import { isEmpty } from 'lodash'
+import { HonoContext } from '../../server/types/HonoContext'
 
 export class AuthController extends ControllerBase {
   private accountService: AccountService
@@ -17,8 +16,8 @@ export class AuthController extends ControllerBase {
     this.accountSessionService = new AccountSessionService()
   }
 
-  public async login(req: Request, res: Response): Promise<void> {
-    const data = req.body as {
+  public async login(ctx: HonoContext<'/login'>) {
+    const data = (await ctx.req.json()) as {
       username: string
       password: string
     }
@@ -26,65 +25,85 @@ export class AuthController extends ControllerBase {
     try {
       if (!data?.username || !data?.password) {
         const badRequestError = new BadRequest()
-        res.status(badRequestError.status).json({
-          error: badRequestError
-        })
-        return
+        return ctx.json(
+          {
+            ok: false,
+            error: badRequestError,
+          },
+          badRequestError.status
+        )
       }
 
       const username = data?.username.toLowerCase().trim()
 
-      const account = await this.accountService.getAccounts({
-        username
-      })
-
+      const account = await this.accountService.getAccountByUsername(username)
       if (account) {
         // * Check password
         if (account.password !== data.password) {
           const unauthorizedError = new Unauthorized('WRONG_DATA')
-          res.status(unauthorizedError.status).send({ error: unauthorizedError })
-          return
+          return ctx.json(
+            {
+              ok: false,
+              error: unauthorizedError,
+            },
+            unauthorizedError.status
+          )
         }
 
         // * Make Account Session
-        const sessionId = v4()
+        const userAgent = ctx.req.header('User-Agent') || ''
+        const ip = ctx.req.header('X-Client-IP') || ''
+
         const [existentSession] = await this.accountSessionService.getSessions({
-          account_id: account.id,
-          ip: req.ip,
-          user_agent: req.headers['user-agent']
+          accountId: account.id,
+          ip,
+          userAgent: userAgent,
         })
+        let sessionId = existentSession?.id || ''
 
         if (isEmpty(existentSession)) {
-          this.accountSessionService.createSession({
-            id: sessionId,
-            ip: req.ip,
-            user_agent: req.headers['user-agent'] || '',
-            expired_at: new Date(Date.now() + 86400000), // 1 day of expiration
-            last_seen_at: new Date(),
-            account_id: account.id,
+          const createdSession = await this.accountSessionService.createSession({
+            ip,
+            userAgent: userAgent || '',
+            expiredAt: new Date(Date.now() + 86400000), // 1 day of expiration
+            lastSeenAt: new Date(),
+            accountId: account.id,
             location: '',
-            name: ''
+            name: '',
           })
+          sessionId = createdSession.id
         } else {
           // * Update Last Seen At if have not account session.
           this.accountSessionService.updateSession({
             id: existentSession?.id,
-            expired_at: new Date(Date.now() + 86400000),
-            last_seen_at: new Date()
+            expiredAt: new Date(Date.now() + 86400000),
+            lastSeenAt: new Date(),
           })
         }
 
-        res.json({
+        return ctx.json({
           ok: true,
-          sessionId: isEmpty(existentSession) ? sessionId : existentSession?.id
+          sessionId: isEmpty(existentSession) ? sessionId : existentSession?.id,
         })
       } else {
         const unauthorizedError = new Unauthorized('WRONG_DATA')
-        res.status(unauthorizedError.status).send({ error: unauthorizedError })
+        return ctx.json(
+          {
+            ok: false,
+            error: unauthorizedError,
+          },
+          unauthorizedError.status
+        )
       }
     } catch (error) {
       console.log(error)
-      res.status(500).send({ error })
+      return ctx.json(
+        {
+          ok: false,
+          error,
+        },
+        500
+      )
     }
   }
 }

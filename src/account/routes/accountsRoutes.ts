@@ -1,9 +1,9 @@
-import { Router } from 'express'
 import AccountController from '../controllers/accountController'
 import { VerifyAuthentication } from '../../auth/middlewares/VerifyAuthentication'
+import { Hono } from 'hono'
 
 const accountController = new AccountController()
-const router = Router()
+const router = new Hono()
 
 router.get('/', VerifyAuthentication, accountController.getAccount)
 router.get('/sessions', VerifyAuthentication, accountController.getAccountSessions)

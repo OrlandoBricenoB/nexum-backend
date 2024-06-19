@@ -1,4 +1,5 @@
-import { CharacterHealthStats } from '../domain/characterHealthStats'
+import { CharacterHealthStatsData } from '../../shared/domain/entities/characters/stats/CharacterHealthStats'
+import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterHealthStatsRepository } from '../repositories/characterHealthStatsRepository'
 
 export class CharacterHealthStatsService {
@@ -8,21 +9,23 @@ export class CharacterHealthStatsService {
     this.characterHealthStatsRepository = new CharacterHealthStatsRepository()
   }
 
-  public async getCharacterHealthStats(characterId: string): Promise<CharacterHealthStats | null> {
+  public async getCharacterHealthStats(characterId: string) {
     const data = await this.characterHealthStatsRepository.getCharacterHealthStats(characterId)
-    return data.length ? CharacterHealthStats.create(data[0]) : null
+    return data as unknown as EntitiesReturnType['CharacterHealthStats']
   }
 
-  public async createCharacterHealthStats(data: Partial<CharacterHealthStats>): Promise<boolean> {
-    return this.characterHealthStatsRepository.createCharacterHealthStats(data)
+  public async createCharacterHealthStats(data: Partial<CharacterHealthStatsData>) {
+    return this.characterHealthStatsRepository.createCharacterHealthStats(
+      data
+    ) as unknown as EntitiesReturnType['CharacterHealthStats']
   }
 
-  public async updateCharacterHealthStats(data: Partial<CharacterHealthStats>): Promise<CharacterHealthStats | null> {
+  public async updateCharacterHealthStats(data: Partial<CharacterHealthStatsData>) {
     const stats = await this.characterHealthStatsRepository.updateCharacterHealthStats(data)
-    return stats
+    return stats as unknown as EntitiesReturnType['CharacterHealthStats']
   }
 
-  public async deleteCharacterHealthStats(id: string): Promise<boolean> {
+  public async deleteCharacterHealthStats(id: string) {
     return this.characterHealthStatsRepository.deleteCharacterHealthStats(id)
   }
 }

@@ -1,4 +1,6 @@
-import { Character } from '../domain/character'
+import { isEmpty } from 'lodash'
+import { CharacterData } from '../../shared/domain/entities/characters/Character'
+import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterRepository } from '../repositories/characterRepository'
 
 export class CharacterService {
@@ -8,45 +10,43 @@ export class CharacterService {
     this.characterRepository = new CharacterRepository()
   }
 
-  public async getAllCharacters(): Promise<Character[]> {
+  public async getAllCharacters() {
     const characters = await this.characterRepository.getAllCharacters()
-    return characters.map(character => Character.create(character)) as Character[]
+    return characters as unknown as Array<EntitiesReturnType['Character']>
   }
 
-  public async getCharacter(id: string): Promise<Character | null> {
+  public async getCharacter(id: string) {
     const character = await this.characterRepository.getCharacter(id)
-
-    return Character.create(character)
+    return character as EntitiesReturnType['Character']
   }
 
-  public async createCharacter(data: Partial<Character>): Promise<boolean> {
-    return this.characterRepository.createCharacter(data)
+  public async createCharacter(data: Partial<CharacterData>) {
+    return this.characterRepository.createCharacter(
+      data
+    ) as unknown as EntitiesReturnType['Character']
   }
 
-  public async updateCharacter(data: Partial<Character>): Promise<Character | null> {
+  public async updateCharacter(data: Partial<CharacterData>) {
     const character = await this.characterRepository.updateCharacter(data)
-    return character
+    return character as EntitiesReturnType['Character']
   }
 
-  public async getAllAccountCharacters(account_id: string): Promise<Character[]> {
-    const allAccountCharacters = await this.characterRepository.getAllCharacters({ account_id })
-
-    return allAccountCharacters.map(character => Character.create(character)) as Character[]
+  public async getAllAccountCharacters(accountId: string) {
+    const allAccountCharacters = await this.characterRepository.getAllAccountCharacters(accountId)
+    return allAccountCharacters as Array<EntitiesReturnType['Character']>
   }
 
-  public async deleteCharacter(id: string): Promise<boolean> {
+  public async deleteCharacter(id: string) {
     return this.characterRepository.deleteCharacter(id)
   }
 
-  public async existsCharacter(id: string): Promise<boolean> {
+  public async existsCharacter(id: string) {
     const character = this.characterRepository.getCharacter(id)
-
-    return character !== null
+    return !isEmpty(character)
   }
 
-  public async getDuplicatedFields(character: Character): Promise<Array<keyof Character>> {
+  public async getDuplicatedFields(character: EntitiesReturnType['Character']) {
     const duplicated = await this.characterRepository.getDuplicatedFields(character)
-
     return duplicated
   }
 }

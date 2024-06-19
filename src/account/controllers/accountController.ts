@@ -1,11 +1,11 @@
-import { Request, Response } from 'express'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 import AccountSessionService from '../services/accountSessionService'
-import { Account } from '../domain/account'
 import { isEmpty } from 'lodash'
 import { BadRequest, DuplicatedError } from '../../shared/errors/customErrors'
-import { AccountSession } from '../domain/accountSession'
 import { AccountService } from '../services/accountService'
+import { HonoContext } from '../../server/types/HonoContext'
+import { Account, AccountData } from '../../shared/domain/entities/accounts/Account'
+import { AccountSessionData } from '../../shared/domain/entities/accounts/AccountSession'
 
 export default class AccountController extends ControllerBase {
   private accountSessionService: AccountSessionService
@@ -18,60 +18,77 @@ export default class AccountController extends ControllerBase {
     this.accountService = new AccountService()
   }
 
-  public async getAccount(req: Request, res: Response): Promise<void> {
-    const account = req.body._account as unknown as Account
+  public async getAccount(ctx: HonoContext<'/'>) {
+    const account = ctx.get('account')
 
-    res.json(account.getInfo())
+    return ctx.json(account.getInfo())
   }
 
-  public async getAccountSessions(req: Request, res: Response): Promise<void> {
-    const account = req.body._account as Account
+  public async getAccountSessions(ctx: HonoContext<'/sessions'>) {
+    const account = ctx.get('account')
 
-    const allSessions = await this.accountSessionService.getSessions({
-      account_id: account.id
-    })
+    const allSessions = await this.accountSessionService.getSessions(account.id)
 
-    res.send(allSessions.map(session => session.getInfo()))
+    return ctx.json(allSessions.map((session) => session.getInfo()))
   }
 
-  public async createAccount(req: Request, res: Response): Promise<void> {
-    const data = req.body as Partial<Account>
+  public async createAccount(ctx: HonoContext<'/create'>) {
+    const data = (await ctx.req.json()) as Partial<AccountData>
 
     data.username = data.username?.toLowerCase().trim()
-    data.is_verified = false
+    data.isVerified = false
     data.image = ''
 
-    const account = Account.create(data) as Account
-    account.generateID()
+    const account = Account(data)
 
     if (!account.isComplete()) {
       const error = new BadRequest()
-      res.status(error.status).send({ error })
-      return
+      return ctx.json(
+        {
+          ok: false,
+          error,
+        },
+        error.status
+      )
     }
 
     const duplicated = await this.accountService.getDuplicatedFields(account)
     if (duplicated.length > 0) {
       const error = new DuplicatedError(duplicated)
-      res.status(error.status).send({ error })
-      return
+      return ctx.json(
+        {
+          ok: false,
+          error,
+        },
+        error.status
+      )
     }
 
     await this.accountService.createAccount(account)
-    res.status(201).send(account.getInfo())
+    return ctx.json(account.getInfo(), 201)
   }
 
-  public async selectSessionCharacter(req: Request, res: Response): Promise<void> {
-    const { character_id, _session } = req.body as { character_id: string; _session: AccountSession }
-
-    if (isEmpty(character_id)) {
-      const error = new BadRequest()
-      res.status(error.status).send({ error })
-      return
+  public async selectSessionCharacter(ctx: HonoContext<'/selectCharacter'>) {
+    const { character_id: characterId, _session } = (await ctx.req.json()) as {
+      character_id: string
+      _session: AccountSessionData
     }
 
-    await this.accountSessionService.updateSession({ id: _session.id, character_id })
+    if (isEmpty(characterId)) {
+      const error = new BadRequest()
+      return ctx.json(
+        {
+          ok: false,
+          error,
+        },
+        error.status
+      )
+    }
 
-    res.json({ character_id })
+    await this.accountSessionService.updateSession({ id: _session.id, characterId })
+
+    return ctx.json({
+      character_id: characterId,
+    })
   }
 }

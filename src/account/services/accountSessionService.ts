@@ -1,5 +1,5 @@
-import { FindQuery } from '../../server/domain/FindQuery'
-import { AccountSession } from '../domain/accountSession'
+import { AccountSessionData } from '../../shared/domain/entities/accounts/AccountSession'
+import { EntitiesReturnType } from '../../shared/types/Entities'
 import { AccountSessionRepository } from '../repositories/accountSessionRepository'
 
 export default class AccountSessionService {
@@ -9,25 +9,23 @@ export default class AccountSessionService {
     this.accountSessionRepository = new AccountSessionRepository()
   }
 
-  public async createSession(data: Partial<AccountSession>): Promise<boolean> {
+  public async createSession(data: Partial<AccountSessionData>) {
     const accountSession = await this.accountSessionRepository.createSession(data)
-    return accountSession
+    return accountSession as unknown as EntitiesReturnType['AccountSession']
   }
 
-  public async getSessions(query: FindQuery<AccountSession>): Promise<AccountSession[]> {
-    const allSessions = await this.accountSessionRepository.getAllAccountSessions(query)
-    return allSessions
+  public async getSessions(data: Pick<AccountSessionData, 'accountId' | 'ip' | 'userAgent'>) {
+    const allSessions = await this.accountSessionRepository.getSessions(data)
+    return allSessions as unknown as Array<EntitiesReturnType['AccountSession']>
   }
 
-  public async getAccountSession(id: string): Promise<AccountSession | null> {
+  public async getAccountSession(id: string) {
     const accountSession = await this.accountSessionRepository.getAccountSession(id)
-
-    return AccountSession.create(accountSession)
+    return accountSession as unknown as EntitiesReturnType['AccountSession']
   }
 
-  public async updateSession(data: Partial<AccountSession>): Promise<AccountSession | null> {
+  public async updateSession(data: Partial<AccountSessionData>) {
     const response = await this.accountSessionRepository.updateSession(data)
-
-    return response
+    return response as unknown as EntitiesReturnType['AccountSession']
   }
 }
