@@ -7,14 +7,17 @@
     "node": ">=20.10.0"
   },
   "scripts": {
-    "start": "tsx ./src/index.ts",
-    "dev": "tsx --watch ./src/index.ts",
+    "deploy:dev": "wrangler deploy --minify -e development",
+    "deploy:prod": "wrangler deploy --minify -e production",
+    "deploy": "npm run deploy:dev && npm run deploy:prod",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
+    "test": "vitest",
     "lint": "eslint src/**/*.ts{,x}",
     "lint:fix": "eslint src/**/*.ts{,x} --fix",
-    "test": "jest",
-    "deploy": "pm2 start npm --name \"nexum-backend\" -- run start",
     "migrations:generate": "drizzle-kit generate",
-    "migrate": "tsx ./src/server/database/migrate.ts"
+    "migrate": "tsx ./src/server/database/migrate.ts",
+    "cf-typegen": "wrangler types"
   },
   "dependencies": {
     "@hono/node-server": "^1.11.3",
@@ -47,6 +50,11 @@
     "husky": "^8.0.3",
     "lint-staged": "^15.2.0",
     "prettier": "^3.1.1",
-    "tsx": "^4.15.6"
+    "tsx": "^4.15.6",
+    "@cloudflare/vitest-pool-workers": "^0.4.5",
+    "@cloudflare/workers-types": "^4.20240614.0",
+    "typescript": "^5.4.5",
+    "vitest": "1.5.0",
+    "wrangler": "^3.60.3"
   }
 }

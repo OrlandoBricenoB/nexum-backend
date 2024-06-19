@@ -12,3 +12,5 @@ registerRoutes(app)
 // * HTTP Server
 const port = process.env.PORT || 3000
 server.listen(Number(port))
+
+export default app
