@@ -1,0 +1,1 @@
+ALTER TABLE "account_sessions" ALTER COLUMN "character_id" DROP NOT NULL;
