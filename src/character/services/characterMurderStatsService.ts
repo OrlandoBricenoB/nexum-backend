@@ -1,31 +1,34 @@
 import { CharacterMurderStatsData } from '../../shared/domain/entities/characters/stats/CharacterMurderStats'
+import { Database } from '../../shared/types/Database'
 import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterMurderStatsRepository } from '../repositories/characterMurderStatsRepository'
 
-export class CharacterMurderStatsService {
-  private characterMurderStatsRepository: CharacterMurderStatsRepository
+export const CharacterMurderStatsService = (db: Database) => {
+  const characterMurderStatsRepository = new CharacterMurderStatsRepository(db)
 
-  constructor() {
-    this.characterMurderStatsRepository = new CharacterMurderStatsRepository()
+  const getCharacterMurderStats = async (characterId: string) => {
+    const data = await characterMurderStatsRepository.getCharacterMurderStats(characterId)
+    return data as EntitiesReturnType['CharacterMurderStats']
   }
 
-  public async getCharacterMurderStats(characterId: string) {
-    const data = await this.characterMurderStatsRepository.getCharacterMurderStats(characterId)
-    return data as unknown as EntitiesReturnType['CharacterMurderStats']
+  const createCharacterMurderStats = async (data: Partial<CharacterMurderStatsData>) => {
+    const stats = await characterMurderStatsRepository.createCharacterMurderStats(data)
+    return stats as EntitiesReturnType['CharacterMurderStats']
   }
 
-  public async createCharacterMurderStats(data: Partial<CharacterMurderStatsData>) {
-    return this.characterMurderStatsRepository.createCharacterMurderStats(
-      data
-    ) as unknown as EntitiesReturnType['CharacterMurderStats']
+  const updateCharacterMurderStats = async (data: Partial<CharacterMurderStatsData>) => {
+    const updatedStats = await characterMurderStatsRepository.updateCharacterMurderStats(data)
+    return updatedStats as EntitiesReturnType['CharacterMurderStats']
   }
 
-  public async updateCharacterMurderStats(data: Partial<CharacterMurderStatsData>) {
-    const stats = await this.characterMurderStatsRepository.updateCharacterMurderStats(data)
-    return stats as unknown as EntitiesReturnType['CharacterMurderStats']
+  const deleteCharacterMurderStats = async (id: string) => {
+    return await characterMurderStatsRepository.deleteCharacterMurderStats(id)
   }
 
-  public async deleteCharacterMurderStats(id: string) {
-    return this.characterMurderStatsRepository.deleteCharacterMurderStats(id)
+  return {
+    getCharacterMurderStats,
+    createCharacterMurderStats,
+    updateCharacterMurderStats,
+    deleteCharacterMurderStats,
   }
 }

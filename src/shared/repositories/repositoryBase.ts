@@ -1,5 +1,4 @@
 import { SQL, eq, sql } from 'drizzle-orm'
-import { database } from '../../config/databaseConfig'
 import { Models } from '../domain/domains'
 import {
   DataEntitiesByKey,
@@ -8,18 +7,21 @@ import {
   EntityKeys,
   EntityModelMap,
 } from '../types/Entities'
+import { Database } from '../types/Database'
 
 export class RepositoryBase<K extends EntityKeys> {
   private readonly model: Models[EntityModelMap[K]]
   private readonly entity: Entities[K]
+  protected readonly db: Database
 
-  constructor(model: Models[EntityModelMap[K]], entity: Entities[K]) {
+  constructor(model: Models[EntityModelMap[K]], entity: Entities[K], db: Database) {
     this.model = model
     this.entity = entity
+    this.db = db
   }
 
   protected async create(item: Partial<DataEntitiesByKey[K]>) {
-    const [created] = await database
+    const [created] = await this.db
       .insert(this.model)
       .values(item as any)
       .returning()
@@ -28,7 +30,7 @@ export class RepositoryBase<K extends EntityKeys> {
   }
 
   protected async update(id: string, item: Partial<DataEntitiesByKey[K]>) {
-    const [updated] = await database
+    const [updated] = await this.db
       .update(this.model)
       .set(item as any)
       .where(eq(this.model.id, id))
@@ -38,16 +40,16 @@ export class RepositoryBase<K extends EntityKeys> {
   }
 
   protected async delete(id: string): Promise<void> {
-    await database.delete(this.model).where(eq(this.model.id, id)).execute()
+    await this.db.delete(this.model).where(eq(this.model.id, id)).execute()
   }
 
   protected async getById(id: string) {
-    const [result] = await database.select().from(this.model).where(eq(this.model.id, id)).execute()
+    const [result] = await this.db.select().from(this.model).where(eq(this.model.id, id)).execute()
     return this.entity(result)
   }
 
   protected async getBySQL(sql: SQL, limit: number = 999999) {
-    const result = (await database
+    const result = (await this.db
       .select()
       .from(this.model)
       .where(sql)
@@ -65,7 +67,7 @@ export class RepositoryBase<K extends EntityKeys> {
     const conditions = uniqueFields.map(
       (key) => `${this.model[key as keyof typeof this.model]} = ${item[key]}`
     )
-    const result = (await database
+    const result = (await this.db
       .select()
       .from(this.model)
       .where(sql`(${conditions.join(' OR ')})`)

@@ -1,19 +1,19 @@
 import { eq } from 'drizzle-orm'
-import { database } from '../../config/databaseConfig'
 import {
   CharacterItem,
   CharacterItemData,
 } from '../../shared/domain/entities/characters/inventory/CharacterItem'
 import { characterItems } from '../../shared/domain/schemas/characters/inventory/characterItems'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
+import { Database } from '../../shared/types/Database'
 
 export class CharacterItemsRepository extends RepositoryBase<'CharacterItem'> {
-  constructor() {
-    super(characterItems, CharacterItem)
+  constructor(db: Database) {
+    super(characterItems, CharacterItem, db)
   }
 
   public async getCharacterItems(characterId: string) {
-    const [result] = await database
+    const [result] = await this.db
       .select()
       .from(characterItems)
       .where(eq(characterItems.characterId, characterId))

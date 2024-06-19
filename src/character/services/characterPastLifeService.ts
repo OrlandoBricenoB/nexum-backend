@@ -1,30 +1,30 @@
 import { CharacterPastLifeData } from '../../shared/domain/entities/CharacterPastLife'
+import { Database } from '../../shared/types/Database'
 import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterPastLifeRepository } from '../repositories/characterPastLifeRepository'
 
-export class CharacterPastLifeService {
-  private characterPastLifeRepository: CharacterPastLifeRepository
+export const CharacterPastLifeService = (db: Database) => {
+  const characterPastLifeRepository = new CharacterPastLifeRepository(db)
 
-  constructor() {
-    this.characterPastLifeRepository = new CharacterPastLifeRepository()
-  }
-
-  public async getAllCharacterPastLifes(characterId: string) {
+  const getAllCharacterPastLifes = async (characterId: string) => {
     const allCharactersPastLifes =
-      await this.characterPastLifeRepository.getAllCharacterPastLifes(characterId)
-
+      await characterPastLifeRepository.getAllCharacterPastLifes(characterId)
     return allCharactersPastLifes as Array<EntitiesReturnType['CharacterPastLife']>
   }
 
-  public async getCharacterPastLife(id: string) {
-    const characterPastLife = await this.characterPastLifeRepository.getCharacterPastLife(id)
-
+  const getCharacterPastLife = async (id: string) => {
+    const characterPastLife = await characterPastLifeRepository.getCharacterPastLife(id)
     return characterPastLife as EntitiesReturnType['CharacterPastLife']
   }
 
-  public async createCharacterPastLife(data: Partial<CharacterPastLifeData>) {
-    return this.characterPastLifeRepository.createCharacterPastLife(
-      data
-    ) as unknown as EntitiesReturnType['CharacterPastLife']
+  const createCharacterPastLife = async (data: Partial<CharacterPastLifeData>) => {
+    const pastLife = await characterPastLifeRepository.createCharacterPastLife(data)
+    return pastLife as EntitiesReturnType['CharacterPastLife']
+  }
+
+  return {
+    getAllCharacterPastLifes,
+    getCharacterPastLife,
+    createCharacterPastLife,
   }
 }

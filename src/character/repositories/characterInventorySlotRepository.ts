@@ -1,19 +1,19 @@
 import { eq } from 'drizzle-orm'
-import { database } from '../../config/databaseConfig'
 import {
   CharacterInventorySlot,
   CharacterInventorySlotData,
 } from '../../shared/domain/entities/characters/inventory/CharacterInventorySlot'
 import { characterInventorySlots } from '../../shared/domain/schemas/characters/inventory/characterInventorySlots'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
+import { Database } from '../../shared/types/Database'
 
 export class CharacterInventorySlotRepository extends RepositoryBase<'CharacterInventorySlot'> {
-  constructor() {
-    super(characterInventorySlots, CharacterInventorySlot)
+  constructor(db: Database) {
+    super(characterInventorySlots, CharacterInventorySlot, db)
   }
 
   public async getCharacterInventorySlot(characterId: string) {
-    const [result] = await database
+    const [result] = await this.db
       .select()
       .from(characterInventorySlots)
       .where(eq(characterInventorySlots.characterId, characterId))

@@ -1,31 +1,34 @@
 import { CharacterWalletData } from '../../shared/domain/entities/characters/inventory/CharacterWallet'
+import { Database } from '../../shared/types/Database'
 import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterWalletRepository } from '../repositories/characterWalletRepository'
 
-export class CharacterWalletService {
-  private characterWalletRepository: CharacterWalletRepository
+export const CharacterWalletService = (db: Database) => {
+  const characterWalletRepository = new CharacterWalletRepository(db)
 
-  constructor() {
-    this.characterWalletRepository = new CharacterWalletRepository()
+  const getCharacterWallet = async (characterId: string) => {
+    const data = await characterWalletRepository.getCharacterWallet(characterId)
+    return data as EntitiesReturnType['CharacterWallet']
   }
 
-  public async getCharacterWallet(characterId: string) {
-    const data = await this.characterWalletRepository.getCharacterWallet(characterId)
-    return data as unknown as EntitiesReturnType['CharacterWallet']
+  const createCharacterWallet = async (data: Partial<CharacterWalletData>) => {
+    const wallet = await characterWalletRepository.createCharacterWallet(data)
+    return wallet as EntitiesReturnType['CharacterWallet']
   }
 
-  public async createCharacterWallet(data: Partial<CharacterWalletData>) {
-    return this.characterWalletRepository.createCharacterWallet(
-      data
-    ) as unknown as EntitiesReturnType['CharacterWallet']
+  const updateCharacterWallet = async (data: Partial<CharacterWalletData>) => {
+    const stats = await characterWalletRepository.updateCharacterWallet(data)
+    return stats as EntitiesReturnType['CharacterWallet']
   }
 
-  public async updateCharacterWallet(data: Partial<CharacterWalletData>) {
-    const stats = await this.characterWalletRepository.updateCharacterWallet(data)
-    return stats as unknown as EntitiesReturnType['CharacterWallet']
+  const deleteCharacterWallet = async (id: string) => {
+    return characterWalletRepository.deleteCharacterWallet(id)
   }
 
-  public async deleteCharacterWallet(id: string) {
-    return this.characterWalletRepository.deleteCharacterWallet(id)
+  return {
+    getCharacterWallet,
+    createCharacterWallet,
+    updateCharacterWallet,
+    deleteCharacterWallet,
   }
 }

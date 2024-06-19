@@ -2,14 +2,11 @@ import { ControllerBase } from '../../shared/domain/controllerBase'
 import { TcpClient } from '../services/tcpClient'
 import { CharacterService } from '../../character/services/characterService'
 import { HonoContext } from '../../server/types/HonoContext'
+import { connect } from '../../config/databaseConfig'
 
 export default class TcpRequestsController extends ControllerBase {
-  private characterService: CharacterService
-
   constructor() {
     super()
-
-    this.characterService = new CharacterService()
   }
 
   public async getAllData(ctx: HonoContext<'/'>) {
@@ -25,15 +22,16 @@ export default class TcpRequestsController extends ControllerBase {
   public async getCharactersByAccount(ctx: HonoContext<'/'>) {
     const tcpClient = new TcpClient()
 
-    const { account_id: accountId } = (await ctx.req.json()) as { account_id: number }
+    const accountId = ctx.get('accountId')
 
-    const characters = await this.characterService.getAllAccountCharacters(accountId)
+    const db = await connect(ctx.env.DATABASE_URL)
+    const characters = await CharacterService(db).getAllAccountCharacters(accountId)
 
     tcpClient.send({
       action: 'charactersByAccount',
       data: characters,
     })
 
-    return ctx.text('Done.')
+    return ctx.text('Done')
   }
 }

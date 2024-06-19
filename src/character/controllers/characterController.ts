@@ -29,28 +29,16 @@ import {
   CharacterWallet,
   CharacterWalletData,
 } from '../../shared/domain/entities/characters/inventory/CharacterWallet'
+import { connect } from '../../config/databaseConfig'
 
 export class CharacterController extends ControllerBase {
-  private characterService: CharacterService
-  private characterStatsService: CharacterStatsService
-  private characterHealthStatsService: CharacterHealthStatsService
-  private characterMurderStatsService: CharacterMurderStatsService
-  private characterAppearanceService: CharacterAppearanceService
-  private characterWalletService: CharacterWalletService
-
   constructor() {
     super()
-
-    this.characterService = new CharacterService()
-    this.characterStatsService = new CharacterStatsService()
-    this.characterHealthStatsService = new CharacterHealthStatsService()
-    this.characterMurderStatsService = new CharacterMurderStatsService()
-    this.characterAppearanceService = new CharacterAppearanceService()
-    this.characterWalletService = new CharacterWalletService()
   }
 
   public async getAllCharacters(ctx: HonoContext<'/'>) {
-    const characters = await this.characterService.getAllCharacters()
+    const db = await connect(ctx.env.DATABASE_URL)
+    const characters = await CharacterService(db).getAllCharacters()
     return ctx.json(characters.map((character) => character.getInfo()))
   }
 
@@ -58,12 +46,21 @@ export class CharacterController extends ControllerBase {
     const id = ctx.req.param('id')
     const { full } = ctx.req.query()
 
+    const db = await connect(ctx.env.DATABASE_URL)
+
+    const characterService = CharacterService(db)
+    const characterAppearanceService = CharacterAppearanceService(db)
+    const characterStatsService = CharacterStatsService(db)
+    const characterHealthStatsService = CharacterHealthStatsService(db)
+    const characterMurderStatsService = CharacterMurderStatsService(db)
+    const characterWalletService = CharacterWalletService(db)
+
     // TODO: El sql de getCharacters debe traer todas las tablas correspondientes.
     // TODO: Si tiene el query full, dará todo, sino, solo apariencia y data principal de character.
-    const character = await this.characterService.getCharacter(id)
+    const character = await characterService.getCharacter(id)
 
     if (character) {
-      const appearance = await this.characterAppearanceService.getCharacterAppearance(id)
+      const appearance = await characterAppearanceService.getCharacterAppearance(id)
       let data: Partial<CharacterData> & {
         appearance: Partial<CharacterAppearanceData>
         stats?: Partial<CharacterStatsData>
@@ -76,10 +73,10 @@ export class CharacterController extends ControllerBase {
       }
 
       if (full) {
-        const stats = await this.characterStatsService.getCharacterStats(id)
-        const healthStats = await this.characterHealthStatsService.getCharacterHealthStats(id)
-        const murderStats = await this.characterMurderStatsService.getCharacterMurderStats(id)
-        const wallet = await this.characterWalletService.getCharacterWallet(id)
+        const stats = await characterStatsService.getCharacterStats(id)
+        const healthStats = await characterHealthStatsService.getCharacterHealthStats(id)
+        const murderStats = await characterMurderStatsService.getCharacterMurderStats(id)
+        const wallet = await characterWalletService.getCharacterWallet(id)
         data = {
           ...data,
           stats,
@@ -126,7 +123,15 @@ export class CharacterController extends ControllerBase {
         )
       }
 
-      const duplicated = await this.characterService.getDuplicatedFields(character)
+      const db = await connect(ctx.env.DATABASE_URL)
+      const characterService = CharacterService(db)
+      const characterAppearanceService = CharacterAppearanceService(db)
+      const characterStatsService = CharacterStatsService(db)
+      const characterHealthStatsService = CharacterHealthStatsService(db)
+      const characterMurderStatsService = CharacterMurderStatsService(db)
+      const characterWalletService = CharacterWalletService(db)
+
+      const duplicated = await characterService.getDuplicatedFields(character)
       if (duplicated.length > 0) {
         const error = new DuplicatedError(duplicated)
         return ctx.json(
@@ -181,12 +186,12 @@ export class CharacterController extends ControllerBase {
       })
 
       // * Create data
-      await this.characterService.createCharacter(character)
-      await this.characterStatsService.createCharacterStats(stats)
-      await this.characterHealthStatsService.createCharacterHealthStats(healthStats)
-      await this.characterMurderStatsService.createCharacterMurderStats(murderStats)
-      await this.characterAppearanceService.createCharacterAppearance(charAppearance)
-      await this.characterWalletService.createCharacterWallet(wallet)
+      await characterService.createCharacter(character)
+      await characterStatsService.createCharacterStats(stats)
+      await characterHealthStatsService.createCharacterHealthStats(healthStats)
+      await characterMurderStatsService.createCharacterMurderStats(murderStats)
+      await characterAppearanceService.createCharacterAppearance(charAppearance)
+      await characterWalletService.createCharacterWallet(wallet)
 
       console.log('Created', character.getInfo())
 
@@ -205,7 +210,11 @@ export class CharacterController extends ControllerBase {
   public async getCharactersByAccount(ctx: HonoContext<'/getAllByAccount'>) {
     const accountId = ctx.get('accountId')
 
-    const characters = await this.characterService.getAllAccountCharacters(accountId)
+    const db = await connect(ctx.env.DATABASE_URL)
+    const characterService = CharacterService(db)
+    const characterStatsService = CharacterStatsService(db)
+
+    const characters = await characterService.getAllAccountCharacters(accountId)
     const charactersData: Array<
       Partial<CharacterData> & {
         stats: Partial<CharacterStatsData>
@@ -215,7 +224,7 @@ export class CharacterController extends ControllerBase {
       const character = characters[i]
       if (!character || !character.id) continue
 
-      const stats = await this.characterStatsService.getCharacterStats(character.id)
+      const stats = await characterStatsService.getCharacterStats(character.id)
       charactersData.push({
         ...character.getInfo(),
         stats: stats.getInfo(),
@@ -228,7 +237,10 @@ export class CharacterController extends ControllerBase {
   public async deleteCharacter(ctx: HonoContext<'/delete'>) {
     const characterId = ctx.get('characterId')
 
-    const existsCharacter = await this.characterService.existsCharacter(characterId)
+    const db = await connect(ctx.env.DATABASE_URL)
+    const characterService = CharacterService(db)
+
+    const existsCharacter = await characterService.existsCharacter(characterId)
 
     if (!existsCharacter) {
       const error = new NotFound('CHARACTER_NOT_FOUND')
@@ -241,7 +253,7 @@ export class CharacterController extends ControllerBase {
       )
     }
 
-    await this.characterService.deleteCharacter(characterId)
+    await characterService.deleteCharacter(characterId)
 
     return ctx.json({
       ok: true,

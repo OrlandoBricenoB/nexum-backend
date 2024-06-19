@@ -1,19 +1,14 @@
 import { BadRequest, Unauthorized } from '../../shared/errors/customErrors'
 import { ControllerBase } from '../../shared/domain/controllerBase'
 import { AccountService } from '../../account/services/accountService'
-import AccountSessionService from '../../account/services/accountSessionService'
 import { isEmpty } from 'lodash'
 import { HonoContext } from '../../server/types/HonoContext'
+import { connect } from '../../config/databaseConfig'
+import { AccountSessionService } from '../../account/services/accountSessionService'
 
 export class AuthController extends ControllerBase {
-  private accountService: AccountService
-  private accountSessionService: AccountSessionService
-
   constructor() {
     super()
-
-    this.accountService = new AccountService()
-    this.accountSessionService = new AccountSessionService()
   }
 
   public async login(ctx: HonoContext<'/login'>) {
@@ -34,9 +29,11 @@ export class AuthController extends ControllerBase {
         )
       }
 
+      const db = await connect(ctx.env.DATABASE_URL)
+
       const username = data?.username.toLowerCase().trim()
 
-      const account = await this.accountService.getAccountByUsername(username)
+      const account = await AccountService(db).getAccountByUsername(username)
       if (account) {
         // * Check password
         if (account.password !== data.password) {
@@ -51,16 +48,18 @@ export class AuthController extends ControllerBase {
         }
 
         // * Make Account Session
+        const accountSessionService = AccountSessionService(db)
+
         const ip = ctx.req.header('X-Client-IP') || ''
 
-        const [existentSession] = await this.accountSessionService.getSessions({
+        const [existentSession] = await accountSessionService.getSessions({
           accountId: account.id,
           ip,
         })
         let sessionId = existentSession?.id || ''
 
         if (isEmpty(existentSession)) {
-          const createdSession = await this.accountSessionService.createSession({
+          const createdSession = await accountSessionService.createSession({
             ip,
             expiredAt: new Date(Date.now() + 86400000), // 1 day of expiration
             lastSeenAt: new Date(),
@@ -70,7 +69,7 @@ export class AuthController extends ControllerBase {
           sessionId = createdSession.id
         } else {
           // * Update Last Seen At if have not account session.
-          this.accountSessionService.updateSession({
+          accountSessionService.updateSession({
             id: existentSession?.id,
             expiredAt: new Date(Date.now() + 86400000),
             lastSeenAt: new Date(),

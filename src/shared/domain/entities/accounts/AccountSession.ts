@@ -5,7 +5,7 @@ export type AccountSessionData = {
   accountId: string
   name: string
   ip: string
-  characterId: string
+  characterId: string | null
   lastSeenAt: Date
   expiredAt: Date
   createdAt: Date

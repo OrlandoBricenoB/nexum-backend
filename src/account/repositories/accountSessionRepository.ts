@@ -1,15 +1,15 @@
 import { and, eq } from 'drizzle-orm'
-import { database } from '../../config/databaseConfig'
 import {
   AccountSession,
   AccountSessionData,
 } from '../../shared/domain/entities/accounts/AccountSession'
 import { accountSessions } from '../../shared/domain/schemas/accounts/accountSessions'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
+import { Database } from '../../shared/types/Database'
 
 export class AccountSessionRepository extends RepositoryBase<'AccountSession'> {
-  constructor() {
-    super(accountSessions, AccountSession)
+  constructor(db: Database) {
+    super(accountSessions, AccountSession, db)
   }
 
   public async createSession(data: Partial<AccountSessionData>) {
@@ -21,7 +21,7 @@ export class AccountSessionRepository extends RepositoryBase<'AccountSession'> {
   }
 
   public async getSessions(data: Pick<AccountSessionData, 'accountId' | 'ip'>) {
-    const results = await database
+    const results = await this.db
       .select()
       .from(accountSessions)
       .where(and(eq(accountSessions.accountId, data.accountId), eq(accountSessions.ip, data.ip)))

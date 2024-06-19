@@ -1,21 +1,21 @@
 import { eq } from 'drizzle-orm'
-import { database } from '../../config/databaseConfig'
 import { Character, CharacterData } from '../../shared/domain/entities/characters/Character'
 import { characters } from '../../shared/domain/schemas/characters/characters'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
+import { Database } from '../../shared/types/Database'
 
 export class CharacterRepository extends RepositoryBase<'Character'> {
-  constructor() {
-    super(characters, Character)
+  constructor(db: Database) {
+    super(characters, Character, db)
   }
 
   public async getAllCharacters() {
-    const results = await database.select().from(characters).execute()
+    const results = await this.db.select().from(characters).execute()
     return results.map((elem) => Character(elem))
   }
 
   public async getAllAccountCharacters(accountId: string) {
-    const results = await database
+    const results = await this.db
       .select()
       .from(characters)
       .where(eq(characters.accountId, accountId))

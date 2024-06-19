@@ -1,33 +1,33 @@
 import { ControllerBase } from '../../shared/domain/controllerBase'
-import AccountSessionService from '../services/accountSessionService'
+import { AccountSessionService } from '../services/accountSessionService'
 import { isEmpty } from 'lodash'
 import { BadRequest, DuplicatedError } from '../../shared/errors/customErrors'
 import { AccountService } from '../services/accountService'
 import { HonoContext } from '../../server/types/HonoContext'
 import { Account, AccountData } from '../../shared/domain/entities/accounts/Account'
-import { AccountSessionData } from '../../shared/domain/entities/accounts/AccountSession'
+import { connect } from '../../config/databaseConfig'
 
 export default class AccountController extends ControllerBase {
-  private accountSessionService: AccountSessionService
-  private accountService: AccountService
-
   constructor() {
     super()
-
-    this.accountSessionService = new AccountSessionService()
-    this.accountService = new AccountService()
   }
 
   public async getAccount(ctx: HonoContext<'/'>) {
-    const account = ctx.get('account')
+    const accountId = ctx.get('accountId')
 
-    return ctx.json(account.getInfo())
+    return ctx.json({
+      id: accountId,
+    })
   }
 
   public async getAccountSessions(ctx: HonoContext<'/sessions'>) {
-    const account = ctx.get('account')
+    const db = await connect(ctx.env.DATABASE_URL)
+    const accountId = ctx.get('accountId')
 
-    const allSessions = await this.accountSessionService.getSessions(account.id)
+    const allSessions = await AccountSessionService(db).getSessions({
+      accountId,
+      ip: ctx.req.raw.headers.get('CF-Connecting-IP') || '',
+    })
 
     return ctx.json(allSessions.map((session) => session.getInfo()))
   }
@@ -35,11 +35,12 @@ export default class AccountController extends ControllerBase {
   public async createAccount(ctx: HonoContext<'/create'>) {
     const data = (await ctx.req.json()) as Partial<AccountData>
 
-    data.username = data.username?.toLowerCase().trim()
-    data.isVerified = false
-    data.image = ''
-
-    const account = Account(data)
+    const account = Account({
+      ...data,
+      username: data.username?.toLowerCase().trim(),
+      isVerified: false,
+      image: '',
+    })
 
     if (!account.isComplete()) {
       const error = new BadRequest()
@@ -52,7 +53,10 @@ export default class AccountController extends ControllerBase {
       )
     }
 
-    const duplicated = await this.accountService.getDuplicatedFields(account)
+    const db = await connect(ctx.env.DATABASE_URL)
+    const accountService = AccountService(db)
+
+    const duplicated = await accountService.getDuplicatedFields(account)
     if (duplicated.length > 0) {
       const error = new DuplicatedError(duplicated)
       return ctx.json(
@@ -64,14 +68,14 @@ export default class AccountController extends ControllerBase {
       )
     }
 
-    await this.accountService.createAccount(account)
+    await accountService.createAccount(account)
     return ctx.json(account.getInfo(), 201)
   }
 
   public async selectSessionCharacter(ctx: HonoContext<'/selectCharacter'>) {
-    const { character_id: characterId, _session } = (await ctx.req.json()) as {
+    const sessionId = ctx.get('sessionId')
+    const { character_id: characterId } = (await ctx.req.json()) as {
       character_id: string
-      _session: AccountSessionData
     }
 
     if (isEmpty(characterId)) {
@@ -85,7 +89,9 @@ export default class AccountController extends ControllerBase {
       )
     }
 
-    await this.accountSessionService.updateSession({ id: _session.id, characterId })
+    const db = await connect(ctx.env.DATABASE_URL)
+
+    await AccountSessionService(db).updateSession({ id: sessionId, characterId })
 
     return ctx.json({
       character_id: characterId,

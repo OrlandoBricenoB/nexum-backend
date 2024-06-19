@@ -5,15 +5,15 @@ import {
 } from '../../shared/domain/entities/characters/inventory/CharacterWallet'
 import { characterWallets } from '../../shared/domain/schemas/characters/inventory/characterWallets'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
-import { database } from '../../config/databaseConfig'
+import { Database } from '../../shared/types/Database'
 
 export class CharacterWalletRepository extends RepositoryBase<'CharacterWallet'> {
-  constructor() {
-    super(characterWallets, CharacterWallet)
+  constructor(db: Database) {
+    super(characterWallets, CharacterWallet, db)
   }
 
   public async getCharacterWallet(characterId: string) {
-    const [result] = await database
+    const [result] = await this.db
       .select()
       .from(characterWallets)
       .where(eq(characterWallets.characterId, characterId))

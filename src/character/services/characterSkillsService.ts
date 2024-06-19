@@ -1,31 +1,34 @@
 import { CharacterSkillData } from '../../shared/domain/entities/characters/skills/CharacterSkill'
+import { Database } from '../../shared/types/Database'
 import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterSkillsRepository } from '../repositories/characterSkillRepository'
 
-export class CharacterSkillsService {
-  private characterSkillRepository: CharacterSkillsRepository
+export const CharacterSkillsService = (db: Database) => {
+  const characterSkillsRepository = new CharacterSkillsRepository(db)
 
-  constructor() {
-    this.characterSkillRepository = new CharacterSkillsRepository()
+  const getCharacterSkills = async (characterId: string) => {
+    const skills = await characterSkillsRepository.getCharacterSkills(characterId)
+    return skills as Array<EntitiesReturnType['CharacterSkill']>
   }
 
-  public async getCharacterSkill(characterId: string) {
-    const skills = await this.characterSkillRepository.getCharacterSkills(characterId)
-    return skills as unknown as Array<EntitiesReturnType['CharacterSkill']>
+  const createCharacterSkill = async (data: Partial<CharacterSkillData>) => {
+    const skill = await characterSkillsRepository.createCharacterSkill(data)
+    return skill as EntitiesReturnType['CharacterSkill']
   }
 
-  public async createCharacterSkill(data: Partial<CharacterSkillData>) {
-    return this.characterSkillRepository.createCharacterSkill(
-      data
-    ) as unknown as EntitiesReturnType['CharacterSkill']
+  const updateCharacterSkill = async (data: Partial<CharacterSkillData>) => {
+    const updatedSkill = await characterSkillsRepository.updateCharacterSkill(data)
+    return updatedSkill as EntitiesReturnType['CharacterSkill']
   }
 
-  public async updateCharacterSkill(data: Partial<CharacterSkillData>) {
-    const stats = await this.characterSkillRepository.updateCharacterSkill(data)
-    return stats as unknown as EntitiesReturnType['CharacterSkill']
+  const deleteCharacterSkill = async (id: string) => {
+    return characterSkillsRepository.deleteCharacterSkill(id)
   }
 
-  public async deleteCharacterSkill(id: string) {
-    return this.characterSkillRepository.deleteCharacterSkill(id)
+  return {
+    getCharacterSkills,
+    createCharacterSkill,
+    updateCharacterSkill,
+    deleteCharacterSkill,
   }
 }

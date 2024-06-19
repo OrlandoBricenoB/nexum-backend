@@ -4,14 +4,13 @@ import { CharacterPastLifeRouter } from '../../character/routes/characterPastLif
 import { AuthRouter } from '../../auth/routes/AuthRouter'
 import { HonoApp } from '../services/honoServer'
 import { Hono } from 'hono'
-import { HonoContext } from '../types/HonoContext'
 import { TcpRequestRouter } from '../../tcp-client/routes/tcpRequestRoutes'
 
 export function registerRoutes(app: HonoApp): void {
-  app.get('/', (ctx: HonoContext<'/'>) => {
-    const ip = ctx.req.header('X-Client-IP') || ''
+  app.get('/', (ctx) => {
+    const ip = ctx.req.raw.headers.get('CF-Connecting-IP') || ''
 
-    return ctx.text(`xd ${ip}`)
+    return ctx.text(`it works! ${ip}`)
   })
 
   const router = new Hono()

@@ -5,15 +5,15 @@ import {
 } from '../../shared/domain/entities/characters/stats/CharacterStats'
 import { characterStats } from '../../shared/domain/schemas/characters/stats/characterStats'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
-import { database } from '../../config/databaseConfig'
+import { Database } from '../../shared/types/Database'
 
 export class CharacterStatsRepository extends RepositoryBase<'CharacterStats'> {
-  constructor() {
-    super(characterStats, CharacterStats)
+  constructor(db: Database) {
+    super(characterStats, CharacterStats, db)
   }
 
   public async getCharacterStats(characterId: string) {
-    const [result] = await database
+    const [result] = await this.db
       .select()
       .from(characterStats)
       .where(eq(characterStats.characterId, characterId))

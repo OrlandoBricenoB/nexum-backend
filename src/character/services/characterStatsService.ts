@@ -1,31 +1,34 @@
 import { CharacterStatsData } from '../../shared/domain/entities/characters/stats/CharacterStats'
+import { Database } from '../../shared/types/Database'
 import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterStatsRepository } from '../repositories/characterStatsRepository'
 
-export class CharacterStatsService {
-  private characterStatsRepository: CharacterStatsRepository
+export const CharacterStatsService = (db: Database) => {
+  const characterStatsRepository = new CharacterStatsRepository(db)
 
-  constructor() {
-    this.characterStatsRepository = new CharacterStatsRepository()
+  const getCharacterStats = async (characterId: string) => {
+    const data = await characterStatsRepository.getCharacterStats(characterId)
+    return data as EntitiesReturnType['CharacterStats']
   }
 
-  public async getCharacterStats(characterId: string) {
-    const data = await this.characterStatsRepository.getCharacterStats(characterId)
-    return data as unknown as EntitiesReturnType['CharacterStats']
+  const createCharacterStats = async (data: Partial<CharacterStatsData>) => {
+    const stats = await characterStatsRepository.createCharacterStats(data)
+    return stats as EntitiesReturnType['CharacterStats']
   }
 
-  public async createCharacterStats(data: Partial<CharacterStatsData>) {
-    return this.characterStatsRepository.createCharacterStats(
-      data
-    ) as unknown as EntitiesReturnType['CharacterStats']
+  const updateCharacterStats = async (data: Partial<CharacterStatsData>) => {
+    const updatedStats = await characterStatsRepository.updateCharacterStats(data)
+    return updatedStats as EntitiesReturnType['CharacterStats']
   }
 
-  public async updateCharacterStats(data: Partial<CharacterStatsData>) {
-    const stats = await this.characterStatsRepository.updateCharacterStats(data)
-    return stats as unknown as EntitiesReturnType['CharacterStats']
+  const deleteCharacterStats = async (id: string) => {
+    return characterStatsRepository.deleteCharacterStats(id)
   }
 
-  public async deleteCharacterStats(id: string) {
-    return this.characterStatsRepository.deleteCharacterStats(id)
+  return {
+    getCharacterStats,
+    createCharacterStats,
+    updateCharacterStats,
+    deleteCharacterStats,
   }
 }

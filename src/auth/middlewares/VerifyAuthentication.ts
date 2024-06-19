@@ -1,9 +1,10 @@
 import { Unauthorized } from '../../shared/errors/customErrors'
-import AccountSessionService from '../../account/services/accountSessionService'
+import { AccountSessionService } from '../../account/services/accountSessionService'
 import { isEmpty } from 'lodash'
 import { AccountService } from '../../account/services/accountService'
 import { HonoContext } from '../../server/types/HonoContext'
 import { Next } from 'hono'
+import { connect } from '../../config/databaseConfig'
 
 export const VerifyAuthentication = async (ctx: HonoContext<'/verify'>, next: Next) => {
   const authorization = ctx.req.header('Authorization') || ''
@@ -22,7 +23,8 @@ export const VerifyAuthentication = async (ctx: HonoContext<'/verify'>, next: Ne
     )
   }
 
-  const sesssionAccountService = new AccountSessionService()
+  const db = await connect(ctx.env.DATABASE_URL)
+  const sesssionAccountService = AccountSessionService(db)
   const session = await sesssionAccountService.getAccountSession(sessionId)
 
   if (isEmpty(session)) {
@@ -51,7 +53,7 @@ export const VerifyAuthentication = async (ctx: HonoContext<'/verify'>, next: Ne
     session.lastSeenAt = new Date()
   }
 
-  const accountService = new AccountService()
+  const accountService = AccountService(db)
   const account = await accountService.getAccount(session.accountId)
 
   if (isEmpty(account)) {
@@ -67,6 +69,6 @@ export const VerifyAuthentication = async (ctx: HonoContext<'/verify'>, next: Ne
 
   ctx.set('accountId', account.id)
   ctx.set('sessionId', session.id)
-  ctx.set('characterId', session.characterId)
+  ctx.set('characterId', session.characterId || '')
   next()
 }

@@ -1,19 +1,19 @@
 import { eq } from 'drizzle-orm'
-import { database } from '../../config/databaseConfig'
 import {
   CharacterPastLife,
   CharacterPastLifeData,
 } from '../../shared/domain/entities/CharacterPastLife'
 import { characterPastLifes } from '../../shared/domain/schemas/characters/characterPastLifes'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
+import { Database } from '../../shared/types/Database'
 
 export class CharacterPastLifeRepository extends RepositoryBase<'CharacterPastLife'> {
-  constructor() {
-    super(characterPastLifes, CharacterPastLife)
+  constructor(db: Database) {
+    super(characterPastLifes, CharacterPastLife, db)
   }
 
   public async getAllCharacterPastLifes(characterId: string) {
-    const results = await database
+    const results = await this.db
       .select()
       .from(characterPastLifes)
       .where(eq(characterPastLifes.characterId, characterId))
@@ -22,7 +22,7 @@ export class CharacterPastLifeRepository extends RepositoryBase<'CharacterPastLi
   }
 
   public async getCharacterPastLife(id: string) {
-    const [result] = await database
+    const [result] = await this.db
       .select()
       .from(characterPastLifes)
       .where(eq(characterPastLifes.id, id))

@@ -1,31 +1,34 @@
 import { CharacterItemData } from '../../shared/domain/entities/characters/inventory/CharacterItem'
+import { Database } from '../../shared/types/Database'
 import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterItemsRepository } from '../repositories/characterItemRepository'
 
-export class CharacterItemsService {
-  private characterItemsRepository: CharacterItemsRepository
+export const CharacterItemsService = (db: Database) => {
+  const characterItemsRepository = new CharacterItemsRepository(db)
 
-  constructor() {
-    this.characterItemsRepository = new CharacterItemsRepository()
+  const getCharacterItems = async (characterId: string) => {
+    const items = await characterItemsRepository.getCharacterItems(characterId)
+    return items as unknown as Array<EntitiesReturnType['CharacterItem']>
   }
 
-  public async getCharacterItems(characterId: string) {
-    const skills = await this.characterItemsRepository.getCharacterItems(characterId)
-    return skills as unknown as Array<EntitiesReturnType['CharacterItem']>
+  const createCharacterItem = async (data: Partial<CharacterItemData>) => {
+    const item = await characterItemsRepository.createCharacterItem(data)
+    return item as EntitiesReturnType['CharacterItem']
   }
 
-  public async createCharacterItem(data: Partial<CharacterItemData>) {
-    return this.characterItemsRepository.createCharacterItem(
-      data
-    ) as unknown as EntitiesReturnType['CharacterItem']
+  const updateCharacterItem = async (data: Partial<CharacterItemData>) => {
+    const stats = await characterItemsRepository.updateCharacterItem(data)
+    return stats as EntitiesReturnType['CharacterItem']
   }
 
-  public async updateCharacterItem(data: Partial<CharacterItemData>) {
-    const stats = await this.characterItemsRepository.updateCharacterItem(data)
-    return stats as unknown as EntitiesReturnType['CharacterItem']
+  const deleteCharacterItem = async (id: string) => {
+    return characterItemsRepository.deleteCharacterItem(id)
   }
 
-  public async deleteCharacterItem(id: string) {
-    return this.characterItemsRepository.deleteCharacterItem(id)
+  return {
+    getCharacterItems,
+    createCharacterItem,
+    updateCharacterItem,
+    deleteCharacterItem,
   }
 }

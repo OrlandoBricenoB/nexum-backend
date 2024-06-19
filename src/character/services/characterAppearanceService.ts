@@ -1,31 +1,34 @@
 import { CharacterAppearanceData } from '../../shared/domain/entities/characters/CharacterAppearance'
+import { Database } from '../../shared/types/Database'
 import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterAppearanceRepository } from '../repositories/characterAppearanceRepository'
 
-export class CharacterAppearanceService {
-  private characterAppearanceRepository: CharacterAppearanceRepository
+export const CharacterAppearanceService = (db: Database) => {
+  const characterAppearanceRepository = new CharacterAppearanceRepository(db)
 
-  constructor() {
-    this.characterAppearanceRepository = new CharacterAppearanceRepository()
+  const getCharacterAppearance = async (characterId: string) => {
+    const data = await characterAppearanceRepository.getCharacterAppearance(characterId)
+    return data as EntitiesReturnType['CharacterAppearance']
   }
 
-  public async getCharacterAppearance(characterId: string) {
-    const data = await this.characterAppearanceRepository.getCharacterAppearance(characterId)
-    return data as unknown as EntitiesReturnType['CharacterAppearance']
+  const createCharacterAppearance = async (data: Partial<CharacterAppearanceData>) => {
+    const appearance = await characterAppearanceRepository.createCharacterAppearance(data)
+    return appearance as EntitiesReturnType['CharacterAppearance']
   }
 
-  public async createCharacterAppearance(data: Partial<CharacterAppearanceData>) {
-    return this.characterAppearanceRepository.createCharacterAppearance(
-      data
-    ) as unknown as EntitiesReturnType['CharacterAppearance']
+  const updateCharacterAppearance = async (data: Partial<CharacterAppearanceData>) => {
+    const stats = await characterAppearanceRepository.updateCharacterAppearance(data)
+    return stats as EntitiesReturnType['CharacterAppearance']
   }
 
-  public async updateCharacterAppearance(data: Partial<CharacterAppearanceData>) {
-    const stats = await this.characterAppearanceRepository.updateCharacterAppearance(data)
-    return stats as unknown as EntitiesReturnType['CharacterAppearance']
+  const deleteCharacterAppearance = async (id: string) => {
+    return characterAppearanceRepository.deleteCharacterAppearance(id)
   }
 
-  public async deleteCharacterAppearance(id: string) {
-    return this.characterAppearanceRepository.deleteCharacterAppearance(id)
+  return {
+    getCharacterAppearance,
+    createCharacterAppearance,
+    updateCharacterAppearance,
+    deleteCharacterAppearance,
   }
 }

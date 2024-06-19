@@ -10,8 +10,7 @@
     "deploy:dev": "wrangler deploy --minify -e development",
     "deploy:prod": "wrangler deploy --minify -e production",
     "deploy": "npm run deploy:dev && npm run deploy:prod",
-    "dev": "wrangler dev",
-    "start": "wrangler dev",
+    "dev": "wrangler dev --port=3000 --remote",
     "test": "vitest",
     "lint": "eslint src/**/*.ts{,x}",
     "lint:fix": "eslint src/**/*.ts{,x} --fix",
@@ -20,7 +19,6 @@
     "cf-typegen": "wrangler types"
   },
   "dependencies": {
-    "@hono/node-server": "^1.11.3",
     "@neondatabase/serverless": "^0.9.3",
     "cors": "^2.8.5",
     "drizzle-orm": "^0.31.2",
@@ -37,6 +35,8 @@
     "{src,tests}/**/*.ts": "npm run lint:fix"
   },
   "devDependencies": {
+    "@cloudflare/vitest-pool-workers": "^0.4.5",
+    "@cloudflare/workers-types": "^4.20240614.0",
     "@types/lodash": "^4.17.5",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
@@ -51,8 +51,6 @@
     "lint-staged": "^15.2.0",
     "prettier": "^3.1.1",
     "tsx": "^4.15.6",
-    "@cloudflare/vitest-pool-workers": "^0.4.5",
-    "@cloudflare/workers-types": "^4.20240614.0",
     "typescript": "^5.4.5",
     "vitest": "1.5.0",
     "wrangler": "^3.60.3"
