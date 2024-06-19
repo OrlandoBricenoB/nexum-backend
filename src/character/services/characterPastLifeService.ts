@@ -1,4 +1,5 @@
-import { CharacterPastLife } from '../domain/characterPastLife'
+import { CharacterPastLifeData } from '../../shared/domain/entities/CharacterPastLife'
+import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterPastLifeRepository } from '../repositories/characterPastLifeRepository'
 
 export class CharacterPastLifeService {
@@ -8,25 +9,22 @@ export class CharacterPastLifeService {
     this.characterPastLifeRepository = new CharacterPastLifeRepository()
   }
 
-  public async getAllCharacterPastLifes(character_id: string): Promise<CharacterPastLife[]> {
-    const allCharactersPastLifes = await this.characterPastLifeRepository.getAllCharacterPastLifes()
+  public async getAllCharacterPastLifes(characterId: string) {
+    const allCharactersPastLifes =
+      await this.characterPastLifeRepository.getAllCharacterPastLifes(characterId)
 
-    const characterPastLifes = allCharactersPastLifes.filter(pastLife => pastLife.character_id === character_id)
-
-    return characterPastLifes.map(pastLife => CharacterPastLife.create(pastLife)) as CharacterPastLife[]
+    return allCharactersPastLifes as Array<EntitiesReturnType['CharacterPastLife']>
   }
 
-  public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {
-    const characterPastLife = (await this.characterPastLifeRepository.getCharacterPastLifw(id)) as CharacterPastLife
+  public async getCharacterPastLife(id: string) {
+    const characterPastLife = await this.characterPastLifeRepository.getCharacterPastLife(id)
 
-    return CharacterPastLife.create(characterPastLife)
+    return characterPastLife as EntitiesReturnType['CharacterPastLife']
   }
 
-  public async getCharacterPastLife(id: string): Promise<CharacterPastLife | null> {
-    return this.characterPastLifeRepository.getCharacterPastLife(id)
-  }
-
-  public async createCharacterPastLife(data: Partial<CharacterPastLife>): Promise<boolean> {
-    return this.characterPastLifeRepository.createCharactePastLife(data)
+  public async createCharacterPastLife(data: Partial<CharacterPastLifeData>) {
+    return this.characterPastLifeRepository.createCharacterPastLife(
+      data
+    ) as unknown as EntitiesReturnType['CharacterPastLife']
   }
 }

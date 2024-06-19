@@ -1,12 +1,28 @@
+import { sql } from 'drizzle-orm'
+import { accounts } from '../../shared/domain/domains'
+import { Account, AccountData } from '../../shared/domain/entities/accounts/Account'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
-import { Account } from '../domain/account'
+import { database } from '../../config/databaseConfig'
 
-export class AccountRepository extends RepositoryBase<Account> {
+export class AccountRepository extends RepositoryBase<'Account'> {
   constructor() {
-    super('accounts')
+    super(accounts, Account)
   }
 
-  public async getAccount(id: string): Promise<Account | null> {
-    return this.getByID(id)
+  public async getAccounts() {
+    const results = await database.select().from(accounts).execute()
+    return results.map((result) => Account(result))
+  }
+
+  public async getAccount(id: string) {
+    return this.getById(id)
+  }
+
+  public async getAccountByUsername(username: string) {
+    return this.getBySQL(sql`${accounts.username} = ${username}`)
+  }
+
+  public async createAccount(data: Partial<AccountData>) {
+    return this.create(data)
   }
 }

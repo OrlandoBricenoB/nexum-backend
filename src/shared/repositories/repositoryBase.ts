@@ -1,29 +1,76 @@
+import { SQL, eq, sql } from 'drizzle-orm'
 import { database } from '../../config/databaseConfig'
+import { Models } from '../domain/domains'
+import {
+  DataEntitiesByKey,
+  Entities,
+  EntitiesReturnType,
+  EntityKeys,
+  EntityModelMap,
+} from '../types/Entities'
 
-export class RepositoryBase<T> {
-  private collection_name: string
+export class RepositoryBase<K extends EntityKeys> {
+  private readonly model: Models[EntityModelMap[K]]
+  private readonly entity: Entities[K]
 
-  constructor(collection_name: string) {
-    this.collection_name = collection_name
+  constructor(model: Models[EntityModelMap[K]], entity: Entities[K]) {
+    this.model = model
+    this.entity = entity
   }
 
-  protected async getAll(): Promise<T[]> {
-    return database.getAll<T>(this.collection_name)
+  protected async create(item: Partial<DataEntitiesByKey[K]>) {
+    const [created] = await database
+      .insert(this.model)
+      .values(item as any)
+      .returning()
+
+    return this.entity(created)
   }
 
-  protected async getByID(id: string): Promise<T | null> {
-    return database.getByID<T>(this.collection_name, id)
+  protected async update(id: string, item: Partial<DataEntitiesByKey[K]>) {
+    const [updated] = await database
+      .update(this.model)
+      .set(item as any)
+      .where(eq(this.model.id, id))
+      .returning()
+
+    return this.entity(updated)
   }
 
-  protected async create(data: Partial<T>): Promise<boolean> {
-    return database.create<T>(this.collection_name, data)
+  protected async delete(id: string): Promise<void> {
+    await database.delete(this.model).where(eq(this.model.id, id)).execute()
   }
 
-  protected async update(id: string, data: Partial<T>): Promise<T> {
-    return database.update<T>(this.collection_name, id, data)
+  protected async getById(id: string) {
+    const [result] = await database.select().from(this.model).where(eq(this.model.id, id)).execute()
+    return this.entity(result)
   }
 
-  protected async delete(id: string): Promise<boolean> {
-    return database.delete(this.collection_name, id)
+  protected async getBySQL(sql: SQL, limit: number = 999999) {
+    const result = (await database
+      .select()
+      .from(this.model)
+      .where(sql)
+      .limit(limit)
+      .execute()) as Array<DataEntitiesByKey[K]>
+
+    return result.map((element) => this.entity(element))
+  }
+
+  public async getDuplicatedFields(
+    item: EntitiesReturnType[K]
+  ): Promise<Array<keyof DataEntitiesByKey[K]>> {
+    const uniqueFields = item.getUniqueFields() as unknown as Array<keyof DataEntitiesByKey[K]>
+
+    const conditions = uniqueFields.map(
+      (key) => `${this.model[key as keyof typeof this.model]} = ${item[key]}`
+    )
+    const result = (await database
+      .select()
+      .from(this.model)
+      .where(sql`(${conditions.join(' OR ')})`)
+      .execute()) as Array<DataEntitiesByKey[K]>
+
+    return uniqueFields.filter((key) => result.some((object) => object[key] === item[key]))
   }
 }

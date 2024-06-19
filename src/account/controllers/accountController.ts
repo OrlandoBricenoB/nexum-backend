@@ -1,101 +1,94 @@
-import { Request, Response } from 'express'
 import { ControllerBase } from '../../shared/domain/controllerBase'
-import { AccountService } from '../services/accountService'
 import AccountSessionService from '../services/accountSessionService'
-import { NotFound, Unauthorized } from '../../shared/errors/customErrors'
+import { isEmpty } from 'lodash'
+import { BadRequest, DuplicatedError } from '../../shared/errors/customErrors'
+import { AccountService } from '../services/accountService'
+import { HonoContext } from '../../server/types/HonoContext'
+import { Account, AccountData } from '../../shared/domain/entities/accounts/Account'
+import { AccountSessionData } from '../../shared/domain/entities/accounts/AccountSession'
 
 export default class AccountController extends ControllerBase {
-  private accountService: AccountService
   private accountSessionService: AccountSessionService
+  private accountService: AccountService
 
   constructor() {
     super()
 
-    this.accountService = new AccountService()
     this.accountSessionService = new AccountSessionService()
+    this.accountService = new AccountService()
   }
 
-  public async getAccount(req: Request, res: Response): Promise<void> {
-    const session_id = req.headers['authorization']
+  public async getAccount(ctx: HonoContext<'/'>) {
+    const account = ctx.get('account')
 
-    if (!session_id) {
-      const missingAuthorizationHeaderError = new Unauthorized('MISSING_AUTHORIZATION_HEADER')
-
-      res.status(missingAuthorizationHeaderError.status).send({ error: missingAuthorizationHeaderError })
-
-      return
-    }
-
-    const accountSession = await this.accountSessionService.getAccountSession(session_id)
-
-    if (!accountSession) {
-      const accountSessionNotFoundError = new NotFound('ACCOUNT_SESSION_NOT_FOUND')
-
-      res.status(accountSessionNotFoundError.status).send({ error: accountSessionNotFoundError })
-
-      return
-    }
-
-    const account = await this.accountService.getAccount(accountSession.account_id)
-
-    if (!account) {
-      const accountNotFoundError = new NotFound('ACCOUNT_NOT_FOUND')
-
-      res.status(accountNotFoundError.status).send({ error: accountNotFoundError })
-
-      return
-    }
-
-    res.json(account.getInfo())
+    return ctx.json(account.getInfo())
   }
 
-  public async getAccountSessions(req: Request, res: Response): Promise<void> {
-    const session_id = req.headers['authorization']
+  public async getAccountSessions(ctx: HonoContext<'/sessions'>) {
+    const account = ctx.get('account')
 
-    if (!session_id) {
-      const missingAuthorizationHeaderError = new Unauthorized('MISSING_AUTHORIZATION_HEADER')
+    const allSessions = await this.accountSessionService.getSessions(account.id)
 
-      res.status(missingAuthorizationHeaderError.status).send({ error: missingAuthorizationHeaderError })
-
-      return
-    }
-
-    const accountSession = await this.accountSessionService.getAccountSession(session_id)
-
-    if (!accountSession) {
-      const accountSessionNotFoundError = new NotFound('ACCOUNT_SESSION_NOT_FOUND')
-
-      res.status(accountSessionNotFoundError.status).send({ error: accountSessionNotFoundError })
-
-      return
-    }
-
-    const allSessions = await this.accountSessionService.getSessionsByAccount(accountSession.account_id)
-
-    res.send(allSessions.map(session => session.getInfo()))
+    return ctx.json(allSessions.map((session) => session.getInfo()))
   }
 
-  public async getAccountSessionById(req: Request, res: Response): Promise<void> {
-    const session_id = req.params.id
+  public async createAccount(ctx: HonoContext<'/create'>) {
+    const data = (await ctx.req.json()) as Partial<AccountData>
 
-    if (!session_id) {
-      const missingAuthorizationHeaderError = new Unauthorized('MISSING_AUTHORIZATION_HEADER')
+    data.username = data.username?.toLowerCase().trim()
+    data.isVerified = false
+    data.image = ''
 
-      res.status(missingAuthorizationHeaderError.status).send({ error: missingAuthorizationHeaderError })
+    const account = Account(data)
 
-      return
+    if (!account.isComplete()) {
+      const error = new BadRequest()
+      return ctx.json(
+        {
+          ok: false,
+          error,
+        },
+        error.status
+      )
     }
 
-    const accountSession = await this.accountSessionService.getAccountSession(session_id)
-
-    if (!accountSession) {
-      const accountSessionNotFoundError = new NotFound('ACCOUNT_SESSION_NOT_FOUND')
-
-      res.status(accountSessionNotFoundError.status).send({ error: accountSessionNotFoundError })
-
-      return
+    const duplicated = await this.accountService.getDuplicatedFields(account)
+    if (duplicated.length > 0) {
+      const error = new DuplicatedError(duplicated)
+      return ctx.json(
+        {
+          ok: false,
+          error,
+        },
+        error.status
+      )
     }
 
-    res.json(accountSession.getInfo())
+    await this.accountService.createAccount(account)
+    return ctx.json(account.getInfo(), 201)
+  }
+
+  public async selectSessionCharacter(ctx: HonoContext<'/selectCharacter'>) {
+    const { character_id: characterId, _session } = (await ctx.req.json()) as {
+      character_id: string
+      _session: AccountSessionData
+    }
+
+    if (isEmpty(characterId)) {
+      const error = new BadRequest()
+      return ctx.json(
+        {
+          ok: false,
+          error,
+        },
+        error.status
+      )
+    }
+
+    await this.accountSessionService.updateSession({ id: _session.id, characterId })
+
+    return ctx.json({
+      character_id: characterId,
+    })
   }
 }

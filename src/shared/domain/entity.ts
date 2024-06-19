@@ -1,31 +1,52 @@
-import { omit } from 'lodash'
-import { v4 as uuid } from 'uuid'
+import { isNil, omit } from 'lodash'
+import { DataEntitiesByKey, EntityKeys } from '../types/Entities'
 
-export class Entity {
-  public id?: string
+export type EntityGet<T extends EntityKeys> = () => Partial<DataEntitiesByKey[T]>
+export type EntityGetPrivateFields = () => string[]
+export type EntityGetUniqueFields = () => string[]
+export type EntityIsComplete = () => boolean
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  static create<T extends Entity>(this: new (...args: any[]) => T, data: Partial<T> | null): T | null {
-    if (!data) return data
+export function Entity<T extends EntityKeys>({
+  privateFields,
+  uniqueFields,
+  data,
+}: {
+  privateFields: string[]
+  uniqueFields: string[]
+  data: Partial<DataEntitiesByKey[T]>
+}): {
+  getPrivateFields: EntityGetPrivateFields
+  getUniqueFields: EntityGetUniqueFields
+  getInfo: EntityGet<T>
+  isComplete: EntityIsComplete
+} {
+  // TODO: Comprobar si funcionó el defineProperty.
+  // const get: EntityGet<T> = () => {
+  //   return data
+  // }
 
-    const empty = new this()
-
-    for (const key in empty) {
-      empty[key] = data[key] as T[Extract<keyof T, string>]
-    }
-
-    return empty
+  const getPrivateFields: EntityGetPrivateFields = () => {
+    return privateFields
   }
 
-  public new(): void {
-    this.id = uuid()
+  const getUniqueFields: EntityGetUniqueFields = () => {
+    return uniqueFields
   }
 
-  protected getPrivateFields(): (keyof this)[] {
-    return []
+  const getInfo: EntityGet<T> = () => {
+    return omit({ ...data }, getPrivateFields()) as unknown as Partial<DataEntitiesByKey[T]>
   }
 
-  public getInfo(): Partial<this> {
-    return omit({ ...this }, this.getPrivateFields()) as Partial<this>
+  const isComplete: EntityIsComplete = () => {
+    const values = Object.values(data)
+
+    return values.every((value) => !isNil(value))
+  }
+
+  return {
+    getPrivateFields,
+    getUniqueFields,
+    getInfo,
+    isComplete,
   }
 }

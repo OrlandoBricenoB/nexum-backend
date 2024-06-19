@@ -1,10 +1,14 @@
-import { Router } from 'express'
 import { CharacterController } from '../controllers/characterController'
+import { VerifyAuthentication } from '../../auth/middlewares/VerifyAuthentication'
+import { Hono } from 'hono'
 
 const characterController = new CharacterController()
-const router = Router()
+const router = new Hono()
 
-router.get('/', characterController.getAllCharacters)
-router.get('/:id', characterController.getCharacter)
+router.get('/', VerifyAuthentication, characterController.getAllCharacters)
+router.get('/getAllByAccount', VerifyAuthentication, characterController.getCharactersByAccount)
+router.post('/create', VerifyAuthentication, characterController.createCharacter)
+router.get('/:id', VerifyAuthentication, characterController.getCharacter)
+router.delete('/:id', VerifyAuthentication, characterController.deleteCharacter)
 
 export const CharacterRoutes = router

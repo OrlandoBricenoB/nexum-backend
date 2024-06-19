@@ -1,4 +1,5 @@
-import { AccountSession } from '../domain/accountSession'
+import { AccountSessionData } from '../../shared/domain/entities/accounts/AccountSession'
+import { EntitiesReturnType } from '../../shared/types/Entities'
 import { AccountSessionRepository } from '../repositories/accountSessionRepository'
 
 export default class AccountSessionService {
@@ -8,16 +9,23 @@ export default class AccountSessionService {
     this.accountSessionRepository = new AccountSessionRepository()
   }
 
-  public async getAccountSession(id: string): Promise<AccountSession | null> {
-    const accountSession = await this.accountSessionRepository.getAccountSession(id)
-
-    return AccountSession.create(accountSession)
+  public async createSession(data: Partial<AccountSessionData>) {
+    const accountSession = await this.accountSessionRepository.createSession(data)
+    return accountSession as unknown as EntitiesReturnType['AccountSession']
   }
 
-  public async getSessionsByAccount(account_id: string): Promise<AccountSession[]> {
-    const allSessions = await this.accountSessionRepository.getAllAccountSessions()
-    const accountSessions = allSessions.filter(session => session.account_id === account_id)
+  public async getSessions(data: Pick<AccountSessionData, 'accountId' | 'ip' | 'userAgent'>) {
+    const allSessions = await this.accountSessionRepository.getSessions(data)
+    return allSessions as unknown as Array<EntitiesReturnType['AccountSession']>
+  }
 
-    return accountSessions.map(session => AccountSession.create(session)) as AccountSession[]
+  public async getAccountSession(id: string) {
+    const accountSession = await this.accountSessionRepository.getAccountSession(id)
+    return accountSession as unknown as EntitiesReturnType['AccountSession']
+  }
+
+  public async updateSession(data: Partial<AccountSessionData>) {
+    const response = await this.accountSessionRepository.updateSession(data)
+    return response as unknown as EntitiesReturnType['AccountSession']
   }
 }
