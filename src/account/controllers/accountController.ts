@@ -29,7 +29,9 @@ export default class AccountController extends ControllerBase {
       ip: ctx.req.raw.headers.get('CF-Connecting-IP') || '',
     })
 
-    return ctx.json(allSessions.map((session) => session.getInfo()))
+    return ctx.json({
+      sessions: allSessions.map((session) => session.getInfo()),
+    })
   }
 
   public async createAccount(ctx: HonoContext<'/create'>) {
@@ -69,7 +71,12 @@ export default class AccountController extends ControllerBase {
     }
 
     await accountService.createAccount(account)
-    return ctx.json(account.getInfo(), 201)
+    return ctx.json(
+      {
+        account: account.getInfo(),
+      },
+      201
+    )
   }
 
   public async selectSessionCharacter(ctx: HonoContext<'/selectCharacter'>) {

@@ -17,7 +17,7 @@ export class CharacterPastLifeController extends ControllerBase {
     const characterPastLifes =
       await CharacterPastLifeService(db).getAllCharacterPastLifes(characterId)
 
-    return ctx.json(characterPastLifes.map((pastLife) => pastLife.getInfo()))
+    return ctx.json({ pastLifes: characterPastLifes.map((pastLife) => pastLife.getInfo()) })
   }
 
   public async getCharacterPastLife(ctx: HonoContext<'/:id'>) {
@@ -27,7 +27,7 @@ export class CharacterPastLifeController extends ControllerBase {
     const characterPastLife = await CharacterPastLifeService(db).getCharacterPastLife(id)
 
     if (characterPastLife) {
-      return ctx.json(characterPastLife.getInfo())
+      return ctx.json({ pastLife: characterPastLife.getInfo() })
     } else {
       const notFoundError = new NotFound('CHARACTER_PAST_LIFE_NOT_FOUND')
       return ctx.json(

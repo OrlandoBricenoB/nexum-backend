@@ -5,6 +5,11 @@ import { HonoVariables } from '../types/HonoContext'
 
 export type HonoApp = Hono<
   {
+    Bindings: {
+      ENVIRONMENT: 'development' | 'production'
+      DATABASE_URL: string
+      SECRET_KEY: string
+    }
     Variables: HonoVariables
   },
   BlankSchema,

@@ -1,7 +1,5 @@
 import { neon } from '@neondatabase/serverless'
 import { drizzle } from 'drizzle-orm/neon-http'
-import { AccountService } from '../account/services/accountService'
-import { CharacterService } from '../character/services/characterService'
 import { Database } from '../shared/types/Database'
 
 async function connect(dbUrl: string) {
@@ -13,14 +11,6 @@ async function connect(dbUrl: string) {
     } else {
       throw new Error('Invalid database type')
     }
-    console.log(`Connected to ${process.env.MODE} database.`)
-
-    const accountService = AccountService(database)
-    const accounts = await accountService.getAccounts()
-    const characterService = CharacterService(database)
-    const characters = await characterService.getAllCharacters()
-    console.log({ accounts })
-    console.log({ characters })
 
     return database
   } catch (error) {

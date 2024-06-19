@@ -5,12 +5,26 @@ import { AuthRouter } from '../../auth/routes/AuthRouter'
 import { HonoApp } from '../services/honoServer'
 import { Hono } from 'hono'
 import { TcpRequestRouter } from '../../tcp-client/routes/tcpRequestRoutes'
+import { connect } from '../../config/databaseConfig'
+import { AccountService } from '../../account/services/accountService'
+import { CharacterService } from '../../character/services/characterService'
 
 export function registerRoutes(app: HonoApp): void {
-  app.get('/', (ctx) => {
+  app.get('/', async (ctx) => {
     const ip = ctx.req.raw.headers.get('CF-Connecting-IP') || ''
 
-    return ctx.text(`it works! ${ip}`)
+    const db = await connect(ctx.env.DATABASE_URL)
+    const accountService = AccountService(db)
+    const accounts = await accountService.getAccounts()
+    const characterService = CharacterService(db)
+    const characters = await characterService.getAllCharacters()
+
+    return ctx.json({
+      message: 'it works!',
+      ip,
+      accounts,
+      characters,
+    })
   })
 
   const router = new Hono()

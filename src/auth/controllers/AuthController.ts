@@ -50,7 +50,7 @@ export class AuthController extends ControllerBase {
         // * Make Account Session
         const accountSessionService = AccountSessionService(db)
 
-        const ip = ctx.req.header('X-Client-IP') || ''
+        const ip = ctx.req.raw.headers.get('CF-Connecting-IP') || ''
 
         const [existentSession] = await accountSessionService.getSessions({
           accountId: account.id,

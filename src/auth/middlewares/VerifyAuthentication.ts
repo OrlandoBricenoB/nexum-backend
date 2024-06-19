@@ -70,5 +70,5 @@ export const VerifyAuthentication = async (ctx: HonoContext<'/verify'>, next: Ne
   ctx.set('accountId', account.id)
   ctx.set('sessionId', session.id)
   ctx.set('characterId', session.characterId || '')
-  next()
+  return next()
 }

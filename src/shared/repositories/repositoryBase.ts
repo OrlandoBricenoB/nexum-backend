@@ -1,4 +1,4 @@
-import { SQL, eq, sql } from 'drizzle-orm'
+import { SQL, eq, or, sql } from 'drizzle-orm'
 import { Models } from '../domain/domains'
 import {
   DataEntitiesByKey,
@@ -8,6 +8,7 @@ import {
   EntityModelMap,
 } from '../types/Entities'
 import { Database } from '../types/Database'
+import { omit } from 'lodash'
 
 export class RepositoryBase<K extends EntityKeys> {
   private readonly model: Models[EntityModelMap[K]]
@@ -23,7 +24,7 @@ export class RepositoryBase<K extends EntityKeys> {
   protected async create(item: Partial<DataEntitiesByKey[K]>) {
     const [created] = await this.db
       .insert(this.model)
-      .values(item as any)
+      .values(omit(item, ['id']) as any)
       .returning()
 
     return this.entity(created)
@@ -65,12 +66,12 @@ export class RepositoryBase<K extends EntityKeys> {
     const uniqueFields = item.getUniqueFields() as unknown as Array<keyof DataEntitiesByKey[K]>
 
     const conditions = uniqueFields.map(
-      (key) => `${this.model[key as keyof typeof this.model]} = ${item[key]}`
+      (key) => sql`${this.model[key as keyof typeof this.model]} = ${item[key]}`
     )
     const result = (await this.db
       .select()
       .from(this.model)
-      .where(sql`(${conditions.join(' OR ')})`)
+      .where(or(...conditions))
       .execute()) as Array<DataEntitiesByKey[K]>
 
     return uniqueFields.filter((key) => result.some((object) => object[key] === item[key]))

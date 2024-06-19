@@ -39,7 +39,9 @@ export class CharacterController extends ControllerBase {
   public async getAllCharacters(ctx: HonoContext<'/'>) {
     const db = await connect(ctx.env.DATABASE_URL)
     const characters = await CharacterService(db).getAllCharacters()
-    return ctx.json(characters.map((character) => character.getInfo()))
+    return ctx.json({
+      characters: characters.map((character) => character.getInfo()),
+    })
   }
 
   public async getCharacter(ctx: HonoContext<'/:id'>) {
@@ -86,7 +88,9 @@ export class CharacterController extends ControllerBase {
         }
       }
 
-      return ctx.json(data)
+      return ctx.json({
+        character: data,
+      })
     } else {
       const notFoundError = new NotFound('CHARACTER_NOT_FOUND')
       return ctx.json(
@@ -104,6 +108,7 @@ export class CharacterController extends ControllerBase {
         character: Pick<CharacterData, 'name' | 'clan' | 'slot'>
         appearance: Partial<CharacterAppearanceData>
       }
+
       const accountId = ctx.get('accountId')
 
       const character = Character(data)
@@ -144,7 +149,6 @@ export class CharacterController extends ControllerBase {
 
       // * Default values for character
       const stats = CharacterStats({
-        characterId: character.id,
         level: 1,
         exp: 0,
         rebirths: 0,
@@ -155,7 +159,6 @@ export class CharacterController extends ControllerBase {
       })
 
       const healthStats = CharacterHealthStats({
-        characterId: character.id,
         vitality: '0.00',
         stamina: '0.00',
         mana: '0.00',
@@ -163,7 +166,6 @@ export class CharacterController extends ControllerBase {
       })
 
       const murderStats = CharacterMurderStats({
-        characterId: character.id,
         honor: 0,
         deathCount: '0.00',
         kills: 0,
@@ -172,7 +174,6 @@ export class CharacterController extends ControllerBase {
       })
 
       const charAppearance = CharacterAppearance({
-        characterId: character.id,
         skinTone: appearance.skinTone,
         hairstyle: appearance.hairstyle,
         facestyle: appearance.facestyle,
@@ -180,22 +181,37 @@ export class CharacterController extends ControllerBase {
       })
 
       const wallet = CharacterWallet({
-        characterId: character.id,
         hesedias: 50,
         nexumCoins: 0,
       })
 
       // * Create data
-      await characterService.createCharacter(character)
-      await characterStatsService.createCharacterStats(stats)
-      await characterHealthStatsService.createCharacterHealthStats(healthStats)
-      await characterMurderStatsService.createCharacterMurderStats(murderStats)
-      await characterAppearanceService.createCharacterAppearance(charAppearance)
-      await characterWalletService.createCharacterWallet(wallet)
+      const createdCharacter = await characterService.createCharacter(character)
+      console.log('createdCharacter', JSON.stringify(createdCharacter.getInfo()))
+      await characterStatsService.createCharacterStats({
+        ...stats,
+        characterId: createdCharacter.id,
+      })
+      await characterHealthStatsService.createCharacterHealthStats({
+        ...healthStats,
+        characterId: createdCharacter.id,
+      })
+      await characterMurderStatsService.createCharacterMurderStats({
+        ...murderStats,
+        characterId: createdCharacter.id,
+      })
+      await characterAppearanceService.createCharacterAppearance({
+        ...charAppearance,
+        characterId: createdCharacter.id,
+      })
+      await characterWalletService.createCharacterWallet({
+        ...wallet,
+        characterId: createdCharacter.id,
+      })
 
-      console.log('Created', character.getInfo())
+      console.log('Created', JSON.stringify(character.getInfo()))
 
-      return ctx.json(character.getInfo())
+      return ctx.json({ character: character.getInfo() })
     } catch (error) {
       console.log(error)
       return ctx.json(
@@ -231,7 +247,7 @@ export class CharacterController extends ControllerBase {
       })
     }
 
-    return ctx.json(charactersData)
+    return ctx.json({ characters: charactersData })
   }
 
   public async deleteCharacter(ctx: HonoContext<'/delete'>) {
