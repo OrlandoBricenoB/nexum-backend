@@ -188,7 +188,7 @@ export class CharacterController extends ControllerBase {
       // * Create data
       const createdCharacter = await characterService.createCharacter(character)
       console.log('createdCharacter', JSON.stringify(createdCharacter.getInfo()))
-      await characterStatsService.createCharacterStats({
+      const createdCharacterStats = await characterStatsService.createCharacterStats({
         ...stats,
         characterId: createdCharacter.id,
       })
@@ -209,9 +209,14 @@ export class CharacterController extends ControllerBase {
         characterId: createdCharacter.id,
       })
 
-      console.log('Created', JSON.stringify(character.getInfo()))
+      console.log('Created', JSON.stringify(createdCharacter.getInfo()))
 
-      return ctx.json({ character: character.getInfo() })
+      return ctx.json({
+        character: {
+          ...createdCharacter.getInfo(),
+          stats: createdCharacterStats.getInfo(),
+        },
+      })
     } catch (error) {
       console.log(error)
       return ctx.json(
