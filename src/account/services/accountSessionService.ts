@@ -16,8 +16,8 @@ export const AccountSessionService = (db: Database) => {
     return allSessions as Array<EntitiesReturnType['AccountSession']>
   }
 
-  const getAccountSession = async (id: string) => {
-    const accountSession = await accountSessionRepository.getAccountSession(id)
+  const getSession = async (id: string) => {
+    const accountSession = await accountSessionRepository.getSession(id)
     return accountSession as EntitiesReturnType['AccountSession']
   }
 
@@ -29,7 +29,7 @@ export const AccountSessionService = (db: Database) => {
   return {
     createSession,
     getSessions,
-    getAccountSession,
+    getSession,
     updateSession,
   }
 }

@@ -101,4 +101,47 @@ export class AuthController extends ControllerBase {
       )
     }
   }
+
+  public async selectCharacter(ctx: HonoContext<'/select-character'>) {
+    const { characterId } = (await ctx.req.json()) as {
+      characterId: string
+    }
+    const sessionId = ctx.get('sessionId')
+
+    try {
+      if (!characterId) {
+        const badRequestError = new BadRequest()
+        return ctx.json(
+          {
+            ok: false,
+            error: badRequestError,
+          },
+          badRequestError.status
+        )
+      }
+
+      const db = await connect(ctx.env.DATABASE_URL)
+
+      const accountSessionService = AccountSessionService(db)
+
+      const updatedSession = await accountSessionService.updateSession({
+        id: sessionId,
+        characterId,
+      })
+
+      return ctx.json({
+        ok: true,
+        sessionId: isEmpty(updatedSession) ? sessionId : updatedSession?.id,
+      })
+    } catch (error) {
+      console.log(error)
+      return ctx.json(
+        {
+          ok: false,
+          error,
+        },
+        500
+      )
+    }
+  }
 }

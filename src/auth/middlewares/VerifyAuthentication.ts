@@ -25,7 +25,7 @@ export const VerifyAuthentication = async (ctx: HonoContext<'/verify'>, next: Ne
 
   const db = await connect(ctx.env.DATABASE_URL)
   const sesssionAccountService = AccountSessionService(db)
-  const session = await sesssionAccountService.getAccountSession(sessionId)
+  const session = await sesssionAccountService.getSession(sessionId)
 
   if (isEmpty(session)) {
     const unauthorizedError = new Unauthorized('ERROR_INVALID_SESSION')

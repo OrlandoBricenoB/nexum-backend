@@ -36,6 +36,10 @@ import {
   CharacterSkillData,
 } from '../domain/entities/characters/skills/CharacterSkill'
 import { CharacterPastLife, CharacterPastLifeData } from '../domain/entities/CharacterPastLife'
+import {
+  CharacterLocation,
+  CharacterLocationData,
+} from '../domain/entities/characters/location/CharacterLocation'
 
 export type Entities = typeof entities
 export type EntitiesReturnType = {
@@ -51,6 +55,7 @@ export type EntitiesReturnType = {
   CharacterWallet: ReturnType<typeof CharacterWallet>
   CharacterSkill: ReturnType<typeof CharacterSkill>
   CharacterPastLife: ReturnType<typeof CharacterPastLife>
+  CharacterLocation: ReturnType<typeof CharacterLocation>
 }
 export type DataEntitiesByKey = {
   Account: AccountData
@@ -65,6 +70,7 @@ export type DataEntitiesByKey = {
   CharacterWallet: CharacterWalletData
   CharacterSkill: CharacterSkillData
   CharacterPastLife: CharacterPastLifeData
+  CharacterLocation: CharacterLocationData
 }
 
 export type EntityModelMap = {
@@ -80,6 +86,7 @@ export type EntityModelMap = {
   CharacterWallet: 'characterWallets'
   CharacterSkill: 'characterSkills'
   CharacterPastLife: 'characterPastLifes'
+  CharacterLocation: 'characterLocations'
 }
 export type EntityKeys = keyof Entities
 export type ModelKeys = keyof Models

@@ -6,6 +6,7 @@ import { CharacterAppearance } from './characters/CharacterAppearance'
 import { CharacterInventorySlot } from './characters/inventory/CharacterInventorySlot'
 import { CharacterItem } from './characters/inventory/CharacterItem'
 import { CharacterWallet } from './characters/inventory/CharacterWallet'
+import { CharacterLocation } from './characters/location/CharacterLocation'
 import { CharacterSkill } from './characters/skills/CharacterSkill'
 import { CharacterHealthStats } from './characters/stats/CharacterHealthStats'
 import { CharacterMurderStats } from './characters/stats/CharacterMurderStats'
@@ -24,4 +25,5 @@ export const entities = {
   CharacterWallet,
   CharacterSkill,
   CharacterPastLife,
+  CharacterLocation,
 }

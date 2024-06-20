@@ -20,11 +20,6 @@ export function Entity<T extends EntityKeys>({
   getInfo: EntityGet<T>
   isComplete: EntityIsComplete
 } {
-  // TODO: Comprobar si funcionó el defineProperty.
-  // const get: EntityGet<T> = () => {
-  //   return data
-  // }
-
   const getPrivateFields: EntityGetPrivateFields = () => {
     return privateFields
   }

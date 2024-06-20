@@ -20,7 +20,7 @@ export default class AccountController extends ControllerBase {
     })
   }
 
-  public async getAccountSessions(ctx: HonoContext<'/sessions'>) {
+  public async getSessions(ctx: HonoContext<'/sessions'>) {
     const db = await connect(ctx.env.DATABASE_URL)
     const accountId = ctx.get('accountId')
 
@@ -81,8 +81,8 @@ export default class AccountController extends ControllerBase {
 
   public async selectSessionCharacter(ctx: HonoContext<'/selectCharacter'>) {
     const sessionId = ctx.get('sessionId')
-    const { character_id: characterId } = (await ctx.req.json()) as {
-      character_id: string
+    const { characterId } = (await ctx.req.json()) as {
+      characterId: string
     }
 
     if (isEmpty(characterId)) {
@@ -101,6 +101,7 @@ export default class AccountController extends ControllerBase {
     await AccountSessionService(db).updateSession({ id: sessionId, characterId })
 
     return ctx.json({
+      ok: true,
       character_id: characterId,
     })
   }

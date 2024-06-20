@@ -1,11 +1,11 @@
 import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { characters } from '../characters'
 
-export const characterItems = pgTable('character_items', {
+export const characterLocations = pgTable('character_locations', {
   id: uuid('id').primaryKey().defaultRandom(),
-  level: integer('level').notNull().default(1),
-  quality: text('quality').notNull().default(''),
-  itemId: text('item_id').notNull().default(''),
+  region: text('region').notNull().default(''),
+  positionX: integer('position_x').notNull().default(0),
+  positionY: integer('position_y').notNull().default(0),
   characterId: uuid('character_id')
     .references(() => characters.id, {
       onDelete: 'cascade',

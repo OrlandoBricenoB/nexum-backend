@@ -5,6 +5,7 @@ import { characters } from './schemas/characters/characters'
 import { characterInventorySlots } from './schemas/characters/inventory/characterInventorySlots'
 import { characterItems } from './schemas/characters/inventory/characterItems'
 import { characterWallets } from './schemas/characters/inventory/characterWallets'
+import { characterLocations } from './schemas/characters/location/characterLocations'
 import { characterSkills } from './schemas/characters/skills/characterSkills'
 import { characterHealthStats } from './schemas/characters/stats/characterHealthStats'
 import { characterMurderStats } from './schemas/characters/stats/characterMurderStats'
@@ -22,6 +23,7 @@ export {
   characterInventorySlots,
   characterWallets,
   characterSkills,
+  characterLocations,
 }
 
 export const models = {
@@ -36,5 +38,6 @@ export const models = {
   characterInventorySlots,
   characterWallets,
   characterSkills,
+  characterLocations,
 }
 export type Models = typeof models

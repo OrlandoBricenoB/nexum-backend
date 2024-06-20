@@ -16,7 +16,7 @@ export class AccountSessionRepository extends RepositoryBase<'AccountSession'> {
     return this.create(data)
   }
 
-  public async getAccountSession(id: string) {
+  public async getSession(id: string) {
     return this.getById(id)
   }
 
