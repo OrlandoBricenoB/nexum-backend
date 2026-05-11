@@ -6,7 +6,7 @@
       "ESNext"
     ] /* Specify a set of bundled library declaration files that describe the target runtime environment. */,
     "module": "es2022",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "strict": true,
     "skipLibCheck": true,
     "isolatedModules": true,

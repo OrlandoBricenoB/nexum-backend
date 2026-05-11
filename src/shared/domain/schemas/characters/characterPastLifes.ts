@@ -1,3 +1,7 @@
+// ============================================================
+// NEXUM - Drizzle Schema: character_past_lifes
+// ============================================================
+
 import { integer, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { characters } from './characters'
 
@@ -16,9 +20,12 @@ export const characterPastLifes = pgTable('character_past_lifes', {
       onDelete: 'cascade',
     })
     .notNull(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at')
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
 })
+
+export type CharacterPastLife = typeof characterPastLifes.$inferSelect
+export type NewCharacterPastLife = typeof characterPastLifes.$inferInsert

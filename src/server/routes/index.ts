@@ -4,7 +4,6 @@ import { CharacterPastLifeRouter } from '../../character/routes/characterPastLif
 import { AuthRouter } from '../../auth/routes/AuthRouter'
 import { HonoApp } from '../services/honoServer'
 import { Hono } from 'hono'
-import { TcpRequestRouter } from '../../tcp-client/routes/tcpRequestRoutes'
 import { connect } from '../../config/databaseConfig'
 import { AccountService } from '../../account/services/accountService'
 import { CharacterService } from '../../character/services/characterService'
@@ -33,7 +32,6 @@ export function registerRoutes(app: HonoApp): void {
   router.route('/accounts', AccountsRouter)
   router.route('/characters', CharacterRoutes)
   router.route('/past-lifes', CharacterPastLifeRouter)
-  router.route('/tcp-requests', TcpRequestRouter)
 
   app.route('/api/v1', router)
 }

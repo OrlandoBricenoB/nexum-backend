@@ -20,7 +20,14 @@ export class HonoServer {
   private app: HonoApp
 
   constructor() {
-    this.app = new Hono<{ Variables: HonoVariables }>({
+    this.app = new Hono<{
+      Bindings: {
+        ENVIRONMENT: 'development' | 'production'
+        DATABASE_URL: string
+        SECRET_KEY: string
+      }
+      Variables: HonoVariables
+    }>({
       strict: false,
     })
     this.app.use('/api/*', cors())

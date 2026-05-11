@@ -1,3 +1,7 @@
+// ============================================================
+// NEXUM - Drizzle Schema: account_sessions
+// ============================================================
+
 import { pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
 import { accounts } from './accounts'
 import { characters } from '../characters/characters'
@@ -14,11 +18,14 @@ export const accountSessions = pgTable('account_sessions', {
   characterId: uuid('character_id').references(() => characters.id, {
     onDelete: 'set null',
   }),
-  lastSeenAt: timestamp('last_seen_at').notNull().defaultNow(),
-  expiredAt: timestamp('expired_at').notNull().defaultNow(),
-  createdAt: timestamp('created_at').notNull().defaultNow(),
-  updatedAt: timestamp('updated_at')
+  lastSeenAt: timestamp('last_seen_at', { withTimezone: true }).notNull().defaultNow(),
+  expiredAt: timestamp('expired_at', { withTimezone: true }).notNull().defaultNow(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true })
     .notNull()
     .defaultNow()
     .$onUpdate(() => new Date()),
 })
+
+export type AccountSession = typeof accountSessions.$inferSelect
+export type NewAccountSession = typeof accountSessions.$inferInsert

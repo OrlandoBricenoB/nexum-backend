@@ -22,42 +22,49 @@ export class RepositoryBase<K extends EntityKeys> {
   }
 
   protected async create(item: Partial<DataEntitiesByKey[K]>) {
-    const [created] = await this.db
-      .insert(this.model)
+    const [created] = (await this.db
+      .insert(this.model as any)
       .values(omit(item, ['id']) as any)
-      .returning()
+      .returning()) as any[]
 
-    return this.entity(created)
+    return this.entity(created as any) as EntitiesReturnType[K]
   }
 
   protected async update(id: string, item: Partial<DataEntitiesByKey[K]>) {
-    const [updated] = await this.db
-      .update(this.model)
+    const [updated] = (await this.db
+      .update(this.model as any)
       .set(item as any)
-      .where(eq(this.model.id, id))
-      .returning()
+      .where(eq((this.model as any).id, id))
+      .returning()) as any[]
 
-    return this.entity(updated)
+    return this.entity(updated as any) as EntitiesReturnType[K]
   }
 
   protected async delete(id: string): Promise<void> {
-    await this.db.delete(this.model).where(eq(this.model.id, id)).execute()
+    await this.db
+      .delete(this.model as any)
+      .where(eq((this.model as any).id, id))
+      .execute()
   }
 
   protected async getById(id: string) {
-    const [result] = await this.db.select().from(this.model).where(eq(this.model.id, id)).execute()
-    return this.entity(result)
+    const [result] = (await this.db
+      .select()
+      .from(this.model as any)
+      .where(eq((this.model as any).id, id))
+      .execute()) as any[]
+    return result ? (this.entity(result as any) as EntitiesReturnType[K]) : null
   }
 
   protected async getBySQL(sql: SQL, limit: number = 999999) {
     const result = (await this.db
       .select()
-      .from(this.model)
+      .from(this.model as any)
       .where(sql)
       .limit(limit)
       .execute()) as Array<DataEntitiesByKey[K]>
 
-    return result.map((element) => this.entity(element))
+    return result.map((element) => this.entity(element as any) as EntitiesReturnType[K])
   }
 
   public async getDuplicatedFields(
@@ -66,14 +73,16 @@ export class RepositoryBase<K extends EntityKeys> {
     const uniqueFields = item.getUniqueFields() as unknown as Array<keyof DataEntitiesByKey[K]>
 
     const conditions = uniqueFields.map(
-      (key) => sql`${this.model[key as keyof typeof this.model]} = ${item[key]}`
+      (key) => sql`${(this.model as any)[key as string]} = ${(item as any)[key]}`
     )
     const result = (await this.db
       .select()
-      .from(this.model)
+      .from(this.model as any)
       .where(or(...conditions))
       .execute()) as Array<DataEntitiesByKey[K]>
 
-    return uniqueFields.filter((key) => result.some((object) => object[key] === item[key]))
+    return uniqueFields.filter((key) =>
+      result.some((object) => (object as any)[key] === (item as any)[key])
+    )
   }
 }

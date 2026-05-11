@@ -1,30 +1,32 @@
 import { Entity } from '../../../entity'
 
-export type CharacterItemData = {
+export type CharacterInventoryItemData = {
   id: string
-  level: number
-  quality: string
-  itemId: string
   characterId: string
+  itemId: string
+  inventory: number
+  slot: string
+  stack: number
   createdAt: Date
   updatedAt: Date
 }
 
-export function CharacterItem(values: Partial<CharacterItemData>) {
+export function CharacterInventoryItem(values: Partial<CharacterInventoryItemData>) {
   const privateFields: string[] = []
   const uniqueFields: string[] = []
 
-  const data: CharacterItemData = {
+  const data: CharacterInventoryItemData = {
     id: values.id || '',
-    level: values.level || 0,
-    quality: values.quality || '',
-    itemId: values.itemId || '',
     characterId: values.characterId || '',
+    itemId: values.itemId || '',
+    inventory: values.inventory || 0,
+    slot: values.slot || '',
+    stack: values.stack || 0,
     createdAt: values.createdAt ? new Date(values.createdAt) : new Date(),
     updatedAt: values.updatedAt ? new Date(values.updatedAt) : new Date(),
   }
 
-  const supEntity = Entity<'CharacterItem'>({
+  const supEntity = Entity<'CharacterInventoryItem'>({
     privateFields,
     uniqueFields,
     data,

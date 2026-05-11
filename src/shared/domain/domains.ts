@@ -1,43 +1,33 @@
 import { accountSessions } from './schemas/accounts/accountSessions'
 import { accounts } from './schemas/accounts/accounts'
-import { characterAppearances } from './schemas/characters/characterAppearances'
+import { characterPastLifes } from './schemas/characters/characterPastLifes'
 import { characters } from './schemas/characters/characters'
-import { characterInventorySlots } from './schemas/characters/inventory/characterInventorySlots'
-import { characterItems } from './schemas/characters/inventory/characterItems'
-import { characterWallets } from './schemas/characters/inventory/characterWallets'
-import { characterLocations } from './schemas/characters/location/characterLocations'
-import { characterSkills } from './schemas/characters/skills/characterSkills'
-import { characterHealthStats } from './schemas/characters/stats/characterHealthStats'
-import { characterMurderStats } from './schemas/characters/stats/characterMurderStats'
-import { characterStats } from './schemas/characters/stats/characterStats'
+import { characterInventoryItems } from './schemas/characters/characterInventoryItems'
+import { characterSkills } from './schemas/characters/characterSkills'
+import { chatLogs, sessionLogs } from './schemas/logs'
+import { items } from './schemas/items'
 
 export {
   accounts,
   accountSessions,
   characters,
-  characterAppearances,
-  characterStats,
-  characterHealthStats,
-  characterMurderStats,
-  characterItems,
-  characterInventorySlots,
-  characterWallets,
+  characterInventoryItems,
   characterSkills,
-  characterLocations,
+  characterPastLifes,
+  items,
+  chatLogs,
+  sessionLogs,
 }
 
 export const models = {
   accounts,
   accountSessions,
   characters,
-  characterAppearances,
-  characterStats,
-  characterHealthStats,
-  characterMurderStats,
-  characterItems,
-  characterInventorySlots,
-  characterWallets,
+  characterInventoryItems,
   characterSkills,
-  characterLocations,
+  characterPastLifes,
+  items,
+  chatLogs,
+  sessionLogs,
 }
 export type Models = typeof models

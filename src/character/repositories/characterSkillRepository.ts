@@ -1,9 +1,9 @@
-import { eq } from 'drizzle-orm'
+import { and, eq } from 'drizzle-orm'
 import {
   CharacterSkill,
   CharacterSkillData,
 } from '../../shared/domain/entities/characters/skills/CharacterSkill'
-import { characterSkills } from '../../shared/domain/schemas/characters/skills/characterSkills'
+import { characterSkills } from '../../shared/domain/schemas/characters/characterSkills'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
 import { Database } from '../../shared/types/Database'
 
@@ -26,8 +26,20 @@ export class CharacterSkillsRepository extends RepositoryBase<'CharacterSkill'> 
   }
 
   public async updateCharacterSkill(data: Partial<CharacterSkillData>) {
-    if (!data.id) return null
-    return this.update(data.id, data)
+    if (!data.characterId || !data.skillId) return null
+
+    const [updated] = (await this.db
+      .update(characterSkills)
+      .set(data)
+      .where(
+        and(
+          eq(characterSkills.characterId, data.characterId),
+          eq(characterSkills.skillId, data.skillId)
+        )
+      )
+      .returning()) as any[]
+
+    return updated ? CharacterSkill(updated) : null
   }
 
   public async deleteCharacterSkill(id: string) {

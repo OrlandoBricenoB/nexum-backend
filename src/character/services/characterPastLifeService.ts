@@ -1,4 +1,4 @@
-import { CharacterPastLifeData } from '../../shared/domain/entities/CharacterPastLife'
+import { CharacterPastLifeData } from '../../shared/domain/entities/characters/CharacterPastLife'
 import { Database } from '../../shared/types/Database'
 import { EntitiesReturnType } from '../../shared/types/Entities'
 import { CharacterPastLifeRepository } from '../repositories/characterPastLifeRepository'

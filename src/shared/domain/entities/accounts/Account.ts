@@ -7,8 +7,11 @@ export type AccountData = {
   email: string
   image: string
   isVerified: boolean
+  isBanned: boolean
+  banReason: string | null
   createdAt: Date
   updatedAt: Date
+  lastLoginAt: Date | null
 }
 
 export function Account(values: Partial<AccountData>) {
@@ -22,8 +25,11 @@ export function Account(values: Partial<AccountData>) {
     email: values.email || '',
     image: values.image || '',
     isVerified: Boolean(values.isVerified),
+    isBanned: Boolean(values.isBanned),
+    banReason: values.banReason || null,
     createdAt: values.createdAt ? new Date(values.createdAt) : new Date(),
     updatedAt: values.updatedAt ? new Date(values.updatedAt) : new Date(),
+    lastLoginAt: values.lastLoginAt ? new Date(values.lastLoginAt) : null,
   }
 
   const supEntity = Entity<'Account'>({

@@ -21,7 +21,7 @@ export function AccountSession(values: Partial<AccountSessionData>) {
     accountId: values.accountId || '',
     name: values.name || '',
     ip: values.ip || '',
-    characterId: values.characterId || '',
+    characterId: values.characterId ?? null,
     lastSeenAt: values.lastSeenAt ? new Date(values.lastSeenAt) : new Date(),
     expiredAt: values.expiredAt ? new Date(values.expiredAt) : new Date(),
     createdAt: values.createdAt ? new Date(values.createdAt) : new Date(),

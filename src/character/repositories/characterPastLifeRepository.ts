@@ -2,7 +2,7 @@ import { eq } from 'drizzle-orm'
 import {
   CharacterPastLife,
   CharacterPastLifeData,
-} from '../../shared/domain/entities/CharacterPastLife'
+} from '../../shared/domain/entities/characters/CharacterPastLife'
 import { characterPastLifes } from '../../shared/domain/schemas/characters/characterPastLifes'
 import { RepositoryBase } from '../../shared/repositories/repositoryBase'
 import { Database } from '../../shared/types/Database'
